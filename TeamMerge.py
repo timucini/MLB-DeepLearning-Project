@@ -1,12 +1,29 @@
-import xlrd
+import pandas as pd
 from pathlib import Path
 
-data_folder = Path("./Data")
+pd.options.mode.chained_assignment = None  # default='warn'
 
-base_data_file = data_folder / "base_data.xlsx"
 
-base_data_workbook = xlrd.open_workbook(base_data_file)
+def load_team_statistics():
+    data_folder = Path("./Data")
+    base_data_file = data_folder / "test_script_data.xlsx"
+    df_teams = pd.read_excel(base_data_file, sheet_name='Teams')
+    return df_teams
 
-base_data_worksheet = base_data_workbook.sheet_by_name("Teams")
 
-print(base_data_worksheet.cell_value(2, 3))
+def team_stats_last_season(year, team_id):
+    df_teams = load_team_statistics()
+    df_test = df_teams.loc[(df_teams['yearID'] == year - 1) & (df_teams['teamID'] == team_id)]
+    df_test['p_exp'] = pythagorean_expectation(df_test)
+    print(df_test.head())
+    return df_test
+
+
+def pythagorean_expectation(last_season_stats):
+    py_expectation = (last_season_stats['R'] ** 1.83) / (
+            last_season_stats['R'] ** 1.83 + last_season_stats['RA'] ** 1.83)
+    print(py_expectation)
+    return py_expectation
+
+
+team_stats_last_season(2018, "ARI")
