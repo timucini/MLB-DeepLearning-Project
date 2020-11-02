@@ -6,8 +6,8 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 def load_team_statistics():
     data_folder = Path("./Data")
-    base_data_file = data_folder / "test_script_data.xlsx"
-    df_teams = pd.read_excel(base_data_file, sheet_name='Teams')
+    base_data_file = data_folder / "Teams.csv"
+    df_teams = pd.read_csv(base_data_file)
     return df_teams
 
 
