@@ -27,6 +27,7 @@ def filter_team_data():
     df_teams['DivWin'] = df_teams['DivWin'].cat
     print(df_teams['DivWin'])
 
+
 #filter_team_data()
 merge_team_statistics()
 
