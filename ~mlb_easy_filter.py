@@ -116,11 +116,11 @@ def filterBattings(battings, dropna=True):
 
 def filterTeams(teams, dropna=True):
     #Dropping columns
-    columns = ['yearID','name','divID','Rank','G','W','L','DivWin','LgWin','WSWin','R','AB','H','2B','3B','HR','BB','SO','SB','CS','HBP','SF','RA','ER','ERA','SHO','SV'
+    columns = ['yearID','teamIDretro','divID','Rank','G','W','L','DivWin','LgWin','WSWin','R','AB','H','2B','3B','HR','BB','SO','SB','CS','HBP','SF','RA','ER','ERA','SHO','SV'
               ,'HA','HRA','BBA','SOA','E','DP','FP']
     teams = teams[columns]
     #Renaming columns
-    teams = teams.rename(columns={"divID":"Division","G":"Games","W":"Wins","L":"Losses","DivWin":"Division winner","LgWin":"League winner","WSWin":"World series winner","R":"Runs scored","AB":"At bats"
+    teams = teams.rename(columns={"teamIDretro":"teamID","divID":"Division","G":"Games","W":"Wins","L":"Losses","DivWin":"Division winner","LgWin":"League winner","WSWin":"World series winner","R":"Runs scored","AB":"At bats"
                                  ,"H":"Hits by batters","2B":"Doubles","3B":"Triples","HR":"Homeruns","BB":"Walks","SO":"Strikeouts","SB":"Stolen bases","CS":"Cought stealing","HBP":"Batters hit by pitch"
                                  ,"SF":"Sacrifice flies","RA":"Opponents runs scored","ER":"Earned runs allowed","ERA":"Earned runs average","SHO":"Shutouts","SV":"Saves","HA":"Hits allowed"
                                  ,"HRA":"Homeruns allowed","BBA":"Walks allowed","SOA":"Strikeouts allowed","E":"Errors","DP":"Double plays","FP":"Fielding percentage"})
@@ -141,7 +141,7 @@ battings    = pd.read_csv(path+r'\~input\Batting.csv', index_col=False)
 gameLogs    = filterGameLogs(gameLogs)
 #Get matching IDs
 gameLogs    = matchPeopleIDs(people, gameLogs)
-gameLogs    = matchTeamIDs(teams, gameLogs)
+#gameLogs    = matchTeamIDs(teams, gameLogs)
 #Filter data
 people      = filterPeople(people)
 teams       = filterTeams(teams)
@@ -175,7 +175,7 @@ uniqueTeamIDs = gameLogs['Visiting team'].unique().tolist()
 uniqueTeamIDs = uniqueTeamIDs + gameLogs['Home team'].unique().tolist()
 uniqueTeamIDs = set(uniqueTeamIDs)
 #Filtering unnecessary data
-teams       = teams[teams['name'].isin(uniqueTeamIDs)].reset_index(drop=True)
+teams       = teams[teams['teamID'].isin(uniqueTeamIDs)].reset_index(drop=True)
 people      = people[people['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
 managers    = managers[managers['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
 salaries    = salaries[salaries['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
