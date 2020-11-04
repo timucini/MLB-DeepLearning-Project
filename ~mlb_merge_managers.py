@@ -21,8 +21,8 @@ def mergeManagers(visitingManagers, homeManagers):
     return mergedManagers
 
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Daten'
-managers = pd.read_csv(path+r'\~filtered\~mlb_filtered_Managers.csv', index_col=False)
-gameLogs = pd.read_csv(path+r'\~filtered\~mlb_filtered_GameLogs.csv', index_col=False)
+path = r'C:\Users\DonBrezz\Documents\GitHub\MLB-DeepLearning-Project'
+managers = pd.read_csv(path+r'\Filtered\_mlb_filtered_Managers.csv', index_col=False)
+gameLogs = pd.read_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index_col=False)
 managers = managers.groupby(['yearID','playerID'], as_index=False)['Games','Wins','Losses'].sum()
-mergeManagers(mergeVisitingManagers(managers, gameLogs),mergeHomeManagers(managers, gameLogs)).to_csv(path+r'\~merged\~mlb_merged_Managers.csv', index = False)
+mergeManagers(mergeVisitingManagers(managers, gameLogs),mergeHomeManagers(managers, gameLogs)).to_csv(path+r'\Merged\_mlb_merged_Managers.csv', index = False)
