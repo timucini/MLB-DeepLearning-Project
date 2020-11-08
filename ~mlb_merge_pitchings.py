@@ -21,9 +21,9 @@ def mergePitchers(visitingPitchers, homePitchers):
     return mergedPitchers
 
 
-path = r'C:\Users\DonBrezz\Documents\GitHub\MLB-DeepLearning-Project'
-pitchers = pd.read_csv(path+r'\Filtered\_mlb_filtered_Pitching.csv', index_col=False)
-gameLogs = pd.read_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index_col=False)
+path = r'/Users/sewerynkozlowski/Desktop/HTW_2_Semester/Analytische Anwendungen/MLB-DeepLearning-Project/MLB-DeepLearning-Project'
+pitchers = pd.read_csv(path+r'/Filtered/_mlb_filtered_Pitching.csv', index_col=False)
+gameLogs = pd.read_csv(path+r'/Filtered/_mlb_filtered_GameLogs.csv', index_col=False)
 
 aggregators = {}
 for column in pitchers.drop(columns=['yearID','playerID']).columns:
