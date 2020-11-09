@@ -105,6 +105,9 @@ def createScorings(gameLogs):
         homeTeams[hTeam]['Home win ratio']   = team.loc[:,'Home team win'].rolling(10).mean().shift(1)
         homeTeams[hTeam]['Home score ratio'] = team.loc[:,'Home score'].rolling(10).mean().shift(1)
         homeTeams[hTeam]['Home odd ratio']   = team.loc[:,'Home team odd'].rolling(10).mean().shift(1)
+        versus = {}
+        for team in homeTeams[hTeam]['Visiting team'].unique():
+            versus[team] = homeTeams[hTeam][homeTeams[hTeam]['Visiting team']==team]
         for vTeam in versus:
             versus[vTeam]['Home versus win ratio']   = team.loc[:,'Home team win'].rolling(5).mean().shift(1)
             versus[vTeam]['Home versus score ratio'] = team.loc[:,'Home score'].rolling(5).mean().shift(1)
@@ -115,7 +118,9 @@ def createScorings(gameLogs):
         vistTeams[vTeam]['Visiting win ratio']   = (1-team.loc[:,'Home team win']).rolling(10).mean().shift(1)
         vistTeams[vTeam]['Visiting score ratio'] = team.loc[:,'Visiting score'].rolling(10).mean().shift(1)
         vistTeams[vTeam]['Visiting odd ratio']   = (1/team.loc[:,'Home team odd']).rolling(10).mean().shift(1)
-        versus = getTeams('Home team', vistTeams[vTeam])
+        versus = {}
+        for team in homeTeams[hTeam]['Home team'].unique():
+            versus[team] = homeTeams[hTeam][homeTeams[hTeam]['Home team']==team]
         for hTeam in versus:
             versus[hTeam]['Visiting versus win ratio']   = (1-team.loc[:,'Home team win']).rolling(5).mean().shift(1)
             versus[hTeam]['Visiting versus score ratio'] = team.loc[:,'Visiting score'].rolling(5).mean().shift(1)
