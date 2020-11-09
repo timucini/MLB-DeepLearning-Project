@@ -17,16 +17,16 @@ def mergePlayers(visitingPlayers, homePlayers, playerNumber):
     return mergedPlayers
 
 def mergeThePlayers(playerNumber):
-    homePlayers = mergeStartingPlayers(fieldings, gameLogs, 'Home', playerNumber)
-    visitingPlayers = mergeStartingPlayers(fieldings, gameLogs, 'Visiting', playerNumber)
-    homePlayers2 = mergeStartingPlayers(fieldings, gameLogs, 'Home', playerNumber+1)
-    visitingPlayers2 = mergeStartingPlayers(fieldings, gameLogs, 'Visiting', playerNumber+1)
+    homePlayers = mergeStartingPlayers(battings, gameLogs, 'Home', playerNumber)
+    visitingPlayers = mergeStartingPlayers(battings, gameLogs, 'Visiting', playerNumber)
+    homePlayers2 = mergeStartingPlayers(battings, gameLogs, 'Home', playerNumber+1)
+    visitingPlayers2 = mergeStartingPlayers(battings, gameLogs, 'Visiting', playerNumber+1)
     merge1 = mergePlayers(visitingPlayers, homePlayers, playerNumber)
     merge2 = mergePlayers(visitingPlayers2, homePlayers2, playerNumber+1)
     merge12 = pd.merge(merge1, merge2, how="left", on="row")
     return merge12
 
-def mergeAllFrames(fieldings, gameLogs):
+def mergeAllFrames(battings, gameLogs):
     merge12 = mergeThePlayers(1)
     merge34 = mergeThePlayers(3)
     merge1234 = pd.merge(merge12, merge34, how="left", on="row")
@@ -34,23 +34,23 @@ def mergeAllFrames(fieldings, gameLogs):
     merge78 = mergeThePlayers(7)
     merge5678 = pd.merge(merge56, merge78, how="left", on="row")
     merge18 = pd.merge(merge1234, merge5678, how="left", on="row")
-    homePlayers9 = mergeStartingPlayers(fieldings, gameLogs, 'Home', 9)
-    visitingPlayers9 = mergeStartingPlayers(fieldings, gameLogs, 'Visiting', 9)
+    homePlayers9 = mergeStartingPlayers(battings, gameLogs, 'Home', 9)
+    visitingPlayers9 = mergeStartingPlayers(battings, gameLogs, 'Visiting', 9)
     merge9 = mergePlayers(visitingPlayers9, homePlayers9, 9)
     merge19 = pd.merge(merge18, merge9, how="left", on="row")
     merge19.to_csv(path + r'\Merged\_mlb_merged_Batting.csv', index=False)
 
 path = r'/Users/sewerynkozlowski/Desktop/HTW_2_Semester/Analytische Anwendungen/MLB-DeepLearning-Project/MLB-DeepLearning-Project'
-fieldings = pd.read_csv(path+r'/Filtered/_mlb_filtered_Batting.csv', index_col=False)
+battings = pd.read_csv(path+r'/Filtered/_mlb_filtered_Batting.csv', index_col=False)
 gameLogs = pd.read_csv(path+r'/Filtered/_mlb_filtered_GameLogs.csv', index_col=False)
 
 aggregators = {}
-for column in fieldings.drop(columns=['yearID','playerID']).columns:
+for column in battings.drop(columns=['yearID','playerID']).columns:
     if column.find("average")>-1:
         aggregators[column] = 'mean'
     else:
         aggregators[column] = 'sum'
 
-battings = fieldings.groupby(['yearID', 'playerID'], as_index=False).agg(aggregators)
+battings = battings.groupby(['yearID', 'playerID'], as_index=False).agg(aggregators)
 
 mergeAllFrames(battings, gameLogs)
