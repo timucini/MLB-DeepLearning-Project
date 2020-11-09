@@ -187,11 +187,12 @@ gameLogs['row'] = range(0,gameLogs.index.size)
 #Rearange row IDs
 gameLogs = gameLogs[(gameLogs.columns[-1:].tolist()+gameLogs.columns[:-1].tolist())]
 #Saving data
-gameLogs.to_csv(path+r'\~filtered\~mlb_filtered_GameLogs.csv', index = False)
-people.to_csv(path+r'\~filtered\~mlb_filtered_People.csv', index = False)
-teams.to_csv(path+r'\~filtered\~mlb_filtered_Teams.csv', index = False)
-managers.to_csv(path+r'\~filtered\~mlb_filtered_Managers.csv', index = False)
-#salaries.to_csv(path+r'\~filtered\~mlb_filtered_Salaries.csv', index = False)
-fieldings.to_csv(path+r'\~filtered\~mlb_filtered_Fielding.csv', index = False)
-pitchings.to_csv(path+r'\~filtered\~mlb_filtered_Pitching.csv', index = False)
-battings.to_csv(path+r'\~filtered\~mlb_filtered_Batting.csv', index = False)
+path = r'C:\Users\DonBrezz\Documents\GitHub\MLB-DeepLearning-Project'
+gameLogs.to_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index = False)
+people.to_csv(path+r'\Filtered\_mlb_filtered_People.csv', index = False)
+teams.to_csv(path+r'\Filtered\_mlb_filtered_Teams.csv', index = False)
+managers.to_csv(path+r'\Filtered\_mlb_filtered_Managers.csv', index = False)
+#salaries.to_csv(path+r'\Filtered\_mlb_filtered_Salaries.csv', index = False)
+fieldings.to_csv(path+r'\Filtered\_mlb_filtered_Fielding.csv', index = False)
+pitchings.to_csv(path+r'\Filtered\_mlb_filtered_Pitching.csv', index = False)
+battings.to_csv(path+r'\Filtered\_mlb_filtered_Batting.csv', index = False)
