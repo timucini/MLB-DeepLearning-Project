@@ -38,10 +38,10 @@ def mergeAllFrames(fieldings, gameLogs):
     visitingPlayers9 = mergeStartingPlayers(fieldings, gameLogs, 'Visiting', 9)
     merge9 = mergePlayers(visitingPlayers9, homePlayers9, 9)
     merge19 = pd.merge(merge18, merge9, how="left", on="row")
-    merge19.to_csv(path + r'\Merged\_mlb_merged_Fieldings.csv', index=False)
+    merge19.to_csv(path + r'\Merged\_mlb_merged_Batting.csv', index=False)
 
 path = r'/Users/sewerynkozlowski/Desktop/HTW_2_Semester/Analytische Anwendungen/MLB-DeepLearning-Project/MLB-DeepLearning-Project'
-fieldings = pd.read_csv(path+r'/Filtered/_mlb_filtered_Fielding.csv', index_col=False)
+fieldings = pd.read_csv(path+r'/Filtered/_mlb_filtered_Batting.csv', index_col=False)
 gameLogs = pd.read_csv(path+r'/Filtered/_mlb_filtered_GameLogs.csv', index_col=False)
 
 aggregators = {}
@@ -51,6 +51,6 @@ for column in fieldings.drop(columns=['yearID','playerID']).columns:
     else:
         aggregators[column] = 'sum'
 
-fieldings = fieldings.groupby(['yearID', 'playerID'], as_index=False).agg(aggregators)
+battings = fieldings.groupby(['yearID', 'playerID'], as_index=False).agg(aggregators)
 
-mergeAllFrames(fieldings, gameLogs)
+mergeAllFrames(battings, gameLogs)
