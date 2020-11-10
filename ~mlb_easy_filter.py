@@ -49,16 +49,6 @@ def matchPeopleIDs(people, gameLogs, dropna=True):
     if dropna==True: return gameLogs.dropna().reset_index(drop=True)
     return gameLogs.reset_index(drop=True)
 
-def matchTeamIDs(teams, gameLogs, dropna=True):
-    #Generating unique identifier
-    identifier = teams[['name','teamIDretro']].drop_duplicates(subset=['teamIDretro'])
-    #Left-outer join
-    gameLogs['Home team'] = pd.merge(gameLogs['Home team'], identifier, left_on='Home team', right_on='teamIDretro', how="left")['name']
-    gameLogs['Visiting team'] = pd.merge(gameLogs['Visiting team'], identifier, left_on='Visiting team', right_on='teamIDretro', how="left")['name']
-    #Returning gameLogs
-    if dropna==True: return gameLogs.dropna().reset_index(drop=True)
-    return gameLogs.reset_index(drop=True)
-
 def filterPeople(people, dropna=True):
     #Generating birthdate
     people = people.rename(columns={"birthYear":"year","birthMonth":"month","birthDay":"day"})
@@ -68,18 +58,10 @@ def filterPeople(people, dropna=True):
     people['height'] = 0.0254*people['height']
     #Dropping columns
     columns = ['playerID','birthdate','weight','height','bats','throws','finalGame']
-    people = people[columns]
+    people = people[columns].drop(columns=['finalGame'])
     #Returning people
     if dropna==True: return people.dropna().reset_index(drop=True)
     return people.reset_index(drop=True)
-
-def filterSalaries(salaries, dropna=True):
-    #Dropping columns
-    columns = ['yearID','playerID','salary']
-    salaries = salaries[columns]
-    #Returning salaries
-    if dropna==True: return salaries.dropna().reset_index(drop=True)
-    return salaries.reset_index(drop=True)
 
 def filterFieldings(fieldings, dropna=True):
     #Dropping columns
@@ -133,7 +115,6 @@ gameLogs    = pd.read_csv(path+r'\~input\GameLogs.csv', index_col=False)
 people      = pd.read_csv(path+r'\~input\People.csv', index_col=False)
 teams       = pd.read_csv(path+r'\~input\Teams.csv', index_col=False)
 managers    = pd.read_csv(path+r'\~input\Managers.csv', index_col=False)
-#salaries    = pd.read_csv(path+r'\~input\Salaries.csv', index_col=False)
 fieldings   = pd.read_csv(path+r'\~input\Fielding.csv', index_col=False)
 pitchings   = pd.read_csv(path+r'\~input\Pitching.csv', index_col=False)
 battings    = pd.read_csv(path+r'\~input\Batting.csv', index_col=False)
@@ -141,58 +122,23 @@ battings    = pd.read_csv(path+r'\~input\Batting.csv', index_col=False)
 gameLogs    = filterGameLogs(gameLogs)
 #Get matching IDs
 gameLogs    = matchPeopleIDs(people, gameLogs)
-#gameLogs    = matchTeamIDs(teams, gameLogs)
 #Filter data
 people      = filterPeople(people)
-teams       = filterTeams(teams)
-managers    = filterManagers(managers)
-#salaries    = filterSalaries(salaries)
-fieldings   = filterFieldings(fieldings)
-pitchings   = filterPitchings(pitchings)
-battings    = filterBattings(battings)
-#Getting data starting year
-yearIndicators = [teams, managers, fieldings, pitchings, battings]
-minYears = []
-for indicator in yearIndicators:
-    minYears.append(min(indicator['yearID'].unique()))
-minYear = max(minYears)
-#Filtering to old data
-gameLogs    = gameLogs[gameLogs['Date']>=dt(minYear+1,1,1,0,0,0,0)].reset_index(drop=True)
-people      = people[pd.to_datetime(people['finalGame'], format="%Y-%m-%d")>=dt(minYear,1,1,0,0,0,0)].drop(columns=['finalGame']).reset_index(drop=True)
-teams       = teams[teams['yearID']>=minYear].reset_index(drop=True)
-managers    = managers[managers['yearID']>=minYear].reset_index(drop=True)
-#salaries    = salaries[salaries['yearID']>=minYear].reset_index(drop=True)
-fieldings   = fieldings[fieldings['yearID']>=minYear].reset_index(drop=True)
-pitchings   = pitchings[pitchings['yearID']>=minYear].reset_index(drop=True)
-battings    = battings[battings['yearID']>=minYear].reset_index(drop=True)
-#Getting uniqe IDs
-uniquePeopleIDs = []
-for idC in gameLogs.columns:
-        if idC.find(" ID")>-1:
-            uniquePeopleIDs = uniquePeopleIDs + gameLogs[idC].unique().tolist()
-uniquePeopleIDs = set(uniquePeopleIDs)
-uniqueTeamIDs = gameLogs['Visiting team'].unique().tolist()
-uniqueTeamIDs = uniqueTeamIDs + gameLogs['Home team'].unique().tolist()
-uniqueTeamIDs = set(uniqueTeamIDs)
-#Filtering unnecessary data
-teams       = teams[teams['teamID'].isin(uniqueTeamIDs)].reset_index(drop=True)
-people      = people[people['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
-managers    = managers[managers['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
-#salaries    = salaries[salaries['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
-fieldings   = fieldings[fieldings['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
-pitchings   = pitchings[pitchings['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
-battings    = battings[battings['playerID'].isin(uniquePeopleIDs)].reset_index(drop=True)
+teams       = filterTeams(teams, False)
+managers    = filterManagers(managers, False)
+fieldings   = filterFieldings(fieldings, False)
+pitchings   = filterPitchings(pitchings, False)
+battings    = filterBattings(battings, False)
 #Creating row IDs
 gameLogs['row'] = range(0,gameLogs.index.size)
 #Rearange row IDs
 gameLogs = gameLogs[(gameLogs.columns[-1:].tolist()+gameLogs.columns[:-1].tolist())]
 #Saving data
-path = r'C:\Users\DonBrezz\Documents\GitHub\MLB-DeepLearning-Project'
+path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
 gameLogs.to_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index = False)
 people.to_csv(path+r'\Filtered\_mlb_filtered_People.csv', index = False)
 teams.to_csv(path+r'\Filtered\_mlb_filtered_Teams.csv', index = False)
 managers.to_csv(path+r'\Filtered\_mlb_filtered_Managers.csv', index = False)
-#salaries.to_csv(path+r'\Filtered\_mlb_filtered_Salaries.csv', index = False)
 fieldings.to_csv(path+r'\Filtered\_mlb_filtered_Fielding.csv', index = False)
 pitchings.to_csv(path+r'\Filtered\_mlb_filtered_Pitching.csv', index = False)
 battings.to_csv(path+r'\Filtered\_mlb_filtered_Batting.csv', index = False)
