@@ -3,6 +3,9 @@ venv/
 data/
 Filtered/
 Merged/
+filtered/
+merged/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
