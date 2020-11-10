@@ -12,7 +12,7 @@ def filterGameLogs(gameLogs, dropna=True):
     gameLogs = gameLogs[gameLogs['Additional information'].isnull()]
     gameLogs = gameLogs[(gameLogs['Visiting league']=="NL") | (gameLogs['Visiting league']=="AL")]
     gameLogs = gameLogs[(gameLogs['Home league']=="NL") | (gameLogs['Home league']=="AL")]
-    gameLogs = gameLogs[gameLogs['Acquisition information']!="P"]
+    #gameLogs = gameLogs[gameLogs['Acquisition information']!="P"]
     #Dropping columns
     columns =   ['Date','Visiting team','Visiting league','Home team','Home league'
                 ,'Visiting score','Home score','Visiting team manager ID','Home team manager ID'
@@ -40,11 +40,12 @@ def filterManagers(managers, dropna=True):
 
 def matchPeopleIDs(people, gameLogs, dropna=True):
     #Generating unique identifier
-    identifier = people[['playerID','retroID']].drop_duplicates(subset=['retroID'])
+    identifier = people[['playerID','retroID']].drop_duplicates(subset=['retroID']).dropna()
     #Left-outer join per ID-column
     for idC in gameLogs.columns:
         if idC.find(" ID")>-1:
-            gameLogs[idC] = pd.merge(gameLogs[idC], identifier, left_on=idC, right_on='retroID', how="left")['playerID']
+            merged        = pd.merge(gameLogs[idC], identifier, left_on=idC, right_on='retroID', how="left")
+            gameLogs[idC] = merged['playerID']
     #Returning gameLogs
     if dropna==True: return gameLogs.dropna().reset_index(drop=True)
     return gameLogs.reset_index(drop=True)
@@ -110,18 +111,18 @@ def filterTeams(teams, dropna=True):
     if dropna==True: return teams.dropna().reset_index(drop=True)
     return teams.reset_index(drop=True)
 #Loading data
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Daten'
-gameLogs    = pd.read_csv(path+r'\~input\GameLogs.csv', index_col=False)
-people      = pd.read_csv(path+r'\~input\People.csv', index_col=False)
-teams       = pd.read_csv(path+r'\~input\Teams.csv', index_col=False)
-managers    = pd.read_csv(path+r'\~input\Managers.csv', index_col=False)
-fieldings   = pd.read_csv(path+r'\~input\Fielding.csv', index_col=False)
-pitchings   = pd.read_csv(path+r'\~input\Pitching.csv', index_col=False)
-battings    = pd.read_csv(path+r'\~input\Batting.csv', index_col=False)
+path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+gameLogs    = pd.read_csv(path+r'\Input\GameLogs.csv', index_col=False)
+people      = pd.read_csv(path+r'\Input\People.csv', index_col=False)
+teams       = pd.read_csv(path+r'\Input\Teams.csv', index_col=False)
+managers    = pd.read_csv(path+r'\Input\Managers.csv', index_col=False)
+fieldings   = pd.read_csv(path+r'\Input\Fielding.csv', index_col=False)
+pitchings   = pd.read_csv(path+r'\Input\Pitching.csv', index_col=False)
+battings    = pd.read_csv(path+r'\Input\Batting.csv', index_col=False)
 #Filter gameLogs
-gameLogs    = filterGameLogs(gameLogs)
+gameLogs    = filterGameLogs(gameLogs, False)
 #Get matching IDs
-gameLogs    = matchPeopleIDs(people, gameLogs)
+gameLogs    = matchPeopleIDs(people, gameLogs, False)
 #Filter data
 people      = filterPeople(people)
 teams       = filterTeams(teams, False)
@@ -133,6 +134,7 @@ battings    = filterBattings(battings, False)
 gameLogs['row'] = range(0,gameLogs.index.size)
 #Rearange row IDs
 gameLogs = gameLogs[(gameLogs.columns[-1:].tolist()+gameLogs.columns[:-1].tolist())]
+print(gameLogs)
 #Saving data
 path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
 gameLogs.to_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index = False)
