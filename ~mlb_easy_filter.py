@@ -136,7 +136,6 @@ gameLogs['row'] = range(0,gameLogs.index.size)
 gameLogs = gameLogs[(gameLogs.columns[-1:].tolist()+gameLogs.columns[:-1].tolist())]
 print(gameLogs)
 #Saving data
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
 gameLogs.to_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index = False)
 people.to_csv(path+r'\Filtered\_mlb_filtered_People.csv', index = False)
 teams.to_csv(path+r'\Filtered\_mlb_filtered_Teams.csv', index = False)
