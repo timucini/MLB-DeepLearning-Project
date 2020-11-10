@@ -1,6 +1,8 @@
 # Python-Stuff
 venv/
 data/
+Filtered/
+Merged/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
