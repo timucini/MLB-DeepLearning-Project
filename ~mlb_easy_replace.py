@@ -2,43 +2,77 @@ import pandas as pd
 import numpy as np
 import datetime
 
-def replaceNAsManagers(managers):
+def replaceNAsManagers(managers, gameLogs):
+    onlyMans    = None
+    for playerColumn in gameLogs.columns:
+        if playerColumn.find("manager")>-1:
+            players = gameLogs[['Date',playerColumn]]
+            players['yearID'] = pd.DatetimeIndex(pd.to_datetime(players['Date'])).year-1
+            players = players.rename(columns={playerColumn:"playerID"})
+            onlyMans = pd.concat([onlyMans, players]).drop(columns='Date').drop_duplicates().dropna().reset_index(drop=True)
     managers    = managers.groupby(['yearID','playerID'], as_index=False)['Games','Wins','Losses'].sum()
     players     = managers['playerID'].unique()
     years       = managers['yearID'].unique()
-    checksum    = players.size*years.size
+    players     = np.array(list(dict.fromkeys(players.tolist()+onlyMans['playerID'].unique().tolist())))
+    years       = np.array(list(dict.fromkeys(years.tolist()+onlyMans['yearID'].unique().tolist())))
     fullMans    = pd.DataFrame(np.array(np.meshgrid(years, players)).T.reshape(-1,2), columns=['yearID','playerID'])
+    fullMans['yearID'] = pd.to_numeric(fullMans['yearID'])
     fullMans    = pd.merge(fullMans, managers, on=['yearID','playerID'], how="left")
     fullMans    = pd.merge(fullMans[['yearID','playerID']], fullMans.groupby(['playerID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
     fullMans    = fullMans.fillna(0)
-    print("Replaced NAs from Managers. Checksum: ",checksum==fullMans.index.size, checksum, fullMans.index.size)
+    fullMans    = pd.merge(onlyMans, fullMans, on=['yearID','playerID'], how="left")
     return fullMans
 
-def replaceNAsFielding(fieldings):
+def replaceNAsFielding(fieldings, gameLogs):
+    onlyField   = None
+    for playerColumn in gameLogs.columns:
+        if playerColumn.find("player")>-1:
+            players = gameLogs[['Date',playerColumn]]
+            players['yearID'] = pd.DatetimeIndex(pd.to_datetime(players['Date'])).year-1
+            players = players.rename(columns={playerColumn:"playerID"})
+            onlyField = pd.concat([onlyField, players]).drop(columns='Date').drop_duplicates().dropna().reset_index(drop=True)
     fieldings   = fieldings.groupby(['yearID','playerID'], as_index=False).sum()
     players     = fieldings['playerID'].unique()
     years       = fieldings['yearID'].unique()
-    checksum    = players.size*years.size
+    players     = np.array(list(dict.fromkeys(players.tolist()+onlyField['playerID'].unique().tolist())))
+    years       = np.array(list(dict.fromkeys(years.tolist()+onlyField['yearID'].unique().tolist())))
     fullField   = pd.DataFrame(np.array(np.meshgrid(years, players)).T.reshape(-1,2), columns=['yearID','playerID'])
+    fullField['yearID'] = pd.to_numeric(fullField['yearID'])
     fullField   = pd.merge(fullField, fieldings, on=['yearID','playerID'], how="left")
     fullField   = pd.merge(fullField[['yearID','playerID']], fullField.groupby(['playerID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
     fullField   = fullField.fillna(0)
-    print("Replaced NAs from Fieldings. Checksum: ",checksum==fullField.index.size, checksum, fullField.index.size)
+    fullField   = pd.merge(onlyField, fullField, on=['yearID','playerID'], how="left")
     return fullField
 
-def replaceNAsBatting(battings):
+def replaceNAsBatting(battings, gameLogs):
+    onlyBatts   = None
+    for playerColumn in gameLogs.columns:
+        if playerColumn.find("player")>-1:
+            players = gameLogs[['Date',playerColumn]]
+            players['yearID'] = pd.DatetimeIndex(pd.to_datetime(players['Date'])).year-1
+            players = players.rename(columns={playerColumn:"playerID"})
+            onlyBatts = pd.concat([onlyBatts, players]).drop(columns='Date').drop_duplicates().dropna().reset_index(drop=True)
     battings   = battings.groupby(['yearID','playerID'], as_index=False).sum()
     players     = battings['playerID'].unique()
     years       = battings['yearID'].unique()
-    checksum    = players.size*years.size
+    players     = np.array(list(dict.fromkeys(players.tolist()+onlyBatts['playerID'].unique().tolist())))
+    years       = np.array(list(dict.fromkeys(years.tolist()+onlyBatts['yearID'].unique().tolist())))
     fullBatts   = pd.DataFrame(np.array(np.meshgrid(years, players)).T.reshape(-1,2), columns=['yearID','playerID'])
+    fullBatts['yearID'] = pd.to_numeric(fullBatts['yearID']) 
     fullBatts   = pd.merge(fullBatts, battings, on=['yearID','playerID'], how="left")
     fullBatts   = pd.merge(fullBatts[['yearID','playerID']], fullBatts.groupby(['playerID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
     fullBatts   = fullBatts.fillna(0)
-    print("Replaced NAs from Battings. Checksum: ",checksum==fullBatts.index.size, checksum, fullBatts.index.size)
+    fullBatts   = pd.merge(onlyBatts, fullBatts, on=['yearID','playerID'], how="left")
     return fullBatts
 
-def replaceNAsPitching(pitchings):
+def replaceNAsPitching(pitchings, gameLogs):
+    onlyPitch   = None
+    for playerColumn in gameLogs.columns:
+        if playerColumn.find("starting pitcher")>-1:
+            players = gameLogs[['Date',playerColumn]]
+            players['yearID'] = pd.DatetimeIndex(pd.to_datetime(players['Date'])).year-1
+            players = players.rename(columns={playerColumn:"playerID"})
+            onlyPitch = pd.concat([onlyPitch, players]).drop(columns='Date').drop_duplicates().dropna().reset_index(drop=True)
     aggregators = {}
     for column in pitchings.drop(columns=['yearID','playerID']).columns:
         if column.find("average")>-1:
@@ -48,15 +82,23 @@ def replaceNAsPitching(pitchings):
     pitchings   = pitchings.groupby(['yearID','playerID'], as_index=False).agg(aggregators)
     players     = pitchings['playerID'].unique()
     years       = pitchings['yearID'].unique()
-    checksum    = players.size*years.size
+    players     = np.array(list(dict.fromkeys(players.tolist()+onlyPitch['playerID'].unique().tolist())))
+    years       = np.array(list(dict.fromkeys(years.tolist()+onlyPitch['yearID'].unique().tolist())))
     fullPitch   = pd.DataFrame(np.array(np.meshgrid(years, players)).T.reshape(-1,2), columns=['yearID','playerID'])
+    fullPitch['yearID'] = pd.to_numeric(fullPitch['yearID'])
     fullPitch   = pd.merge(fullPitch, pitchings, on=['yearID','playerID'], how="left")
     fullPitch   = pd.merge(fullPitch[['yearID','playerID']], fullPitch.groupby(['playerID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
     fullPitch   = fullPitch.fillna(0)
-    print("Replaced NAs from Pitchings. Checksum: ",checksum==fullPitch.index.size, checksum, fullPitch.index.size)
+    fullPitch   = pd.merge(onlyPitch, fullPitch, on=['yearID','playerID'], how="left")
     return fullPitch
 
-def replaceNAsTeams(teams):
+def replaceNAsTeams(teams, gameLogs):
+    onlyTeams   = None
+    for teamsColumn in ['Visiting team', 'Home team']:
+        team = gameLogs[['Date',teamsColumn]]
+        team['yearID'] = pd.DatetimeIndex(pd.to_datetime(team['Date'])).year-1
+        team = team.rename(columns={teamsColumn:"teamID"})
+        onlyTeams = pd.concat([onlyTeams, team]).drop(columns='Date').drop_duplicates().dropna().reset_index(drop=True)
     teams['division C'] = (teams['Division']=="C")
     teams['division E'] = (teams['Division']=="E")
     teams['division W'] = (teams['Division']=="W")
@@ -72,10 +114,12 @@ def replaceNAsTeams(teams):
         else:
             aggregators[column] = 'sum'
     teams       = teams.groupby(['yearID','teamID'], as_index=False).agg(aggregators)
-    players     = teams['teamID'].unique()
+    teamids     = teams['teamID'].unique()
     years       = teams['yearID'].unique()
-    checksum    = players.size*years.size
-    fullTeams   = pd.DataFrame(np.array(np.meshgrid(years, players)).T.reshape(-1,2), columns=['yearID','teamID'])
+    teamids     = np.array(list(dict.fromkeys(teamids.tolist()+onlyTeams['teamID'].unique().tolist())))
+    years       = np.array(list(dict.fromkeys(years.tolist()+onlyTeams['yearID'].unique().tolist())))
+    fullTeams   = pd.DataFrame(np.array(np.meshgrid(years, teamids)).T.reshape(-1,2), columns=['yearID','teamID'])
+    fullTeams['yearID'] = pd.to_numeric(fullTeams['yearID'])
     fullTeams   = pd.merge(fullTeams, teams, on=['yearID','teamID'], how="left")
     fullTeams   = pd.merge(fullTeams[['yearID','teamID']], fullTeams.groupby(['teamID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
     fullTeams['division C'] = fullTeams['division C'].fillna(False)
@@ -85,23 +129,32 @@ def replaceNAsTeams(teams):
     fullTeams['League winner']      = fullTeams['League winner'].fillna(False)
     fullTeams['World series winner']= fullTeams['World series winner'].fillna(False)
     fullTeams   = fullTeams.drop(columns=['Division'])
+    fullTeams['Pythagorean expectation'] = (fullTeams['Runs scored']**1.83)/(fullTeams['Runs scored']**1.83+fullTeams['Opponents runs scored']**1.83)
     fullTeams   = fullTeams.fillna(0)
-    print("Replaced NAs from Teams. Checksum: ",checksum==fullTeams.index.size, checksum, fullTeams.index.size)
+    fullTeams    = pd.merge(onlyTeams, fullTeams, on=['yearID','teamID'], how="left")
     return fullTeams
 
-def encodePeople(people):
+def encodePeople(people, gameLogs):
+    onlyPeopl   = []
+    for peopleColumn in gameLogs.columns:
+        if peopleColumn.find("ID")>-1:
+            onlyPeopl = onlyPeopl + gameLogs[peopleColumn].unique().tolist()
+    people = people[people['playerID'].isin(onlyPeopl)]
     people['bats right'] = (people['bats']=="R") | (people['bats']=="B")
     people['bats left'] = (people['bats']=="L") | (people['bats']=="B")
     people['throws right'] = people['throws']=="R"
     people = people.drop(columns=['bats','throws'])
-    print("People encoded")
+    #print("People encoded")
     return people
 
-def encodeGames(gameLogs):
+def encodeGames(gameLogs, minYear):
+    gameLogs = gameLogs[pd.to_datetime(gameLogs['Date'])>=datetime.datetime(minYear,1,1)]
     gameLogs['Visiting league AL'] = gameLogs['Visiting league']=="AL"
     gameLogs['Home league AL']     = gameLogs['Home league']=="AL"
     gameLogs = gameLogs.drop(columns=['Visiting league','Home league'])
-    print("GameLogs encoded")
+    gameLogs = gameLogs.dropna().reset_index(drop=True)
+    gameLogs['row'] = range(0,gameLogs.index.size)
+    gameLogs = gameLogs[(gameLogs.columns[-1:].tolist()+gameLogs.columns[:-1].tolist())]
     return gameLogs
 
 path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
@@ -113,10 +166,23 @@ pitchings   = pd.read_csv(path+r'\Filtered\_mlb_filtered_Pitching.csv', index_co
 battings    = pd.read_csv(path+r'\Filtered\_mlb_filtered_Batting.csv', index_col=False)
 fieldings   = pd.read_csv(path+r'\Filtered\_mlb_filtered_Fielding.csv', index_col=False)
 
-encodeGames(gameLogs).to_csv(path+r'\Replaced\_mlb_encoded_GameLogs.csv', index = False)
-encodePeople(people).to_csv(path+r'\Replaced\_mlb_encoded_People.csv', index = False)
-replaceNAsTeams(teams).to_csv(path+r'\Replaced\_mlb_replaced_Teams.csv', index = False)
-replaceNAsPitching(pitchings).to_csv(path+r'\Replaced\_mlb_replaced_Pitching.csv', index = False)
-replaceNAsBatting(battings).to_csv(path+r'\Replaced\_mlb_replaced_Batting.csv', index = False)
-replaceNAsFielding(fieldings).to_csv(path+r'\Replaced\_mlb_replaced_Fielding.csv', index = False)
-replaceNAsManagers(managers).to_csv(path+r'\Replaced\_mlb_replaced_Managers.csv', index = False)
+people      = encodePeople(people, gameLogs)
+teams       = replaceNAsTeams(teams, gameLogs)
+managers    = replaceNAsManagers(managers, gameLogs)
+pitchings   = replaceNAsPitching(pitchings, gameLogs)
+battings    = replaceNAsBatting(battings, gameLogs)
+fieldings   = replaceNAsFielding(fieldings, gameLogs)
+yearIndicators = [teams, managers, fieldings, pitchings, battings]
+
+minYears = []
+for indicator in yearIndicators:
+    minYears.append(min(indicator['yearID'].unique()))
+minYear = max(minYears)
+
+encodeGames(gameLogs, minYear).to_csv(path+r'\Replaced\_mlb_encoded_GameLogs.csv', index = False)
+people.to_csv(path+r'\Replaced\_mlb_encoded_People.csv', index = False)
+teams.to_csv(path+r'\Replaced\_mlb_replaced_Teams.csv', index = False)
+managers.to_csv(path+r'\Replaced\_mlb_replaced_Managers.csv', index = False)
+pitchings.to_csv(path+r'\Replaced\_mlb_replaced_Pitching.csv', index = False)
+battings.to_csv(path+r'\Replaced\_mlb_replaced_Batting.csv', index = False)
+fieldings.to_csv(path+r'\Replaced\_mlb_replaced_Fielding.csv', index = False)
