@@ -5,7 +5,10 @@ Filtered/
 Merged/
 filtered/
 merged/
-
+remerged/
+replaced/
+Remerged/
+Replaced/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -135,3 +138,18 @@ dmypy.json
 *.xlsx
 *.pyc
 *.pyc
+Remerged/_mlb_recreated_Scoring.csv
+Remerged/_mlb_remerged_Batting.csv
+Remerged/_mlb_remerged_Fielding.csv
+Remerged/_mlb_remerged_Managers.csv
+Remerged/_mlb_remerged_People.csv
+Remerged/_mlb_remerged_Pitchers.csv
+Remerged/_mlb_remerged_Teams.csv
+Replaced/_mlb_encoded_GameLogs.csv
+Replaced/_mlb_encoded_People.csv
+Replaced/_mlb_remerged_all.csv
+Replaced/_mlb_replaced_Batting.csv
+Replaced/_mlb_replaced_Fielding.csv
+Replaced/_mlb_replaced_Managers.csv
+Replaced/_mlb_replaced_Pitching.csv
+Replaced/_mlb_replaced_Teams.csv
