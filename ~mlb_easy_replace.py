@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import datetime
 
-def replaceNAsManagers(managers, gameLogs):
+def replaceNAsManagers(managers, gameLogs, default=True):
     onlyMans    = None
     for playerColumn in gameLogs.columns:
         if playerColumn.find("manager")>-1:
@@ -19,11 +19,12 @@ def replaceNAsManagers(managers, gameLogs):
     fullMans['yearID'] = pd.to_numeric(fullMans['yearID'])
     fullMans    = pd.merge(fullMans, managers, on=['yearID','playerID'], how="left")
     fullMans    = pd.merge(fullMans[['yearID','playerID']], fullMans.groupby(['playerID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
-    fullMans    = fullMans.fillna(0)
+    if default:
+        fullMans    = fullMans.fillna(0)
     fullMans    = pd.merge(onlyMans, fullMans, on=['yearID','playerID'], how="left")
     return fullMans
 
-def replaceNAsFielding(fieldings, gameLogs):
+def replaceNAsFielding(fieldings, gameLogs, default=True):
     onlyField   = None
     for playerColumn in gameLogs.columns:
         if playerColumn.find("player")>-1:
@@ -40,11 +41,12 @@ def replaceNAsFielding(fieldings, gameLogs):
     fullField['yearID'] = pd.to_numeric(fullField['yearID'])
     fullField   = pd.merge(fullField, fieldings, on=['yearID','playerID'], how="left")
     fullField   = pd.merge(fullField[['yearID','playerID']], fullField.groupby(['playerID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
-    fullField   = fullField.fillna(0)
+    if default:
+        fullField   = fullField.fillna(0)
     fullField   = pd.merge(onlyField, fullField, on=['yearID','playerID'], how="left")
     return fullField
 
-def replaceNAsBatting(battings, gameLogs):
+def replaceNAsBatting(battings, gameLogs, default=True):
     onlyBatts   = None
     for playerColumn in gameLogs.columns:
         if playerColumn.find("player")>-1:
@@ -61,11 +63,12 @@ def replaceNAsBatting(battings, gameLogs):
     fullBatts['yearID'] = pd.to_numeric(fullBatts['yearID']) 
     fullBatts   = pd.merge(fullBatts, battings, on=['yearID','playerID'], how="left")
     fullBatts   = pd.merge(fullBatts[['yearID','playerID']], fullBatts.groupby(['playerID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
-    fullBatts   = fullBatts.fillna(0)
+    if default:
+        fullBatts   = fullBatts.fillna(0)
     fullBatts   = pd.merge(onlyBatts, fullBatts, on=['yearID','playerID'], how="left")
     return fullBatts
 
-def replaceNAsPitching(pitchings, gameLogs):
+def replaceNAsPitching(pitchings, gameLogs, default=True):
     onlyPitch   = None
     for playerColumn in gameLogs.columns:
         if playerColumn.find("starting pitcher")>-1:
@@ -88,11 +91,12 @@ def replaceNAsPitching(pitchings, gameLogs):
     fullPitch['yearID'] = pd.to_numeric(fullPitch['yearID'])
     fullPitch   = pd.merge(fullPitch, pitchings, on=['yearID','playerID'], how="left")
     fullPitch   = pd.merge(fullPitch[['yearID','playerID']], fullPitch.groupby(['playerID']).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
-    fullPitch   = fullPitch.fillna(0)
+    if default:
+        fullPitch   = fullPitch.fillna(0)
     fullPitch   = pd.merge(onlyPitch, fullPitch, on=['yearID','playerID'], how="left")
     return fullPitch
 
-def replaceNAsTeams(teams, gameLogs):
+def replaceNAsTeams(teams, gameLogs, default=True):
     onlyTeams   = None
     for teamsColumn in ['Visiting team', 'Home team']:
         team = gameLogs[['Date',teamsColumn]]
@@ -130,7 +134,8 @@ def replaceNAsTeams(teams, gameLogs):
     fullTeams['World series winner']= fullTeams['World series winner'].fillna(False)
     fullTeams   = fullTeams.drop(columns=['Division'])
     fullTeams['Pythagorean expectation'] = (fullTeams['Runs scored']**1.83)/(fullTeams['Runs scored']**1.83+fullTeams['Opponents runs scored']**1.83)
-    fullTeams   = fullTeams.fillna(0)
+    if default:
+        fullTeams   = fullTeams.fillna(0)
     fullTeams    = pd.merge(onlyTeams, fullTeams, on=['yearID','teamID'], how="left")
     return fullTeams
 
@@ -168,10 +173,10 @@ fieldings   = pd.read_csv(path+r'\Filtered\_mlb_filtered_Fielding.csv', index_co
 
 people      = encodePeople(people, gameLogs)
 teams       = replaceNAsTeams(teams, gameLogs)
-managers    = replaceNAsManagers(managers, gameLogs)
-pitchings   = replaceNAsPitching(pitchings, gameLogs)
-battings    = replaceNAsBatting(battings, gameLogs)
-fieldings   = replaceNAsFielding(fieldings, gameLogs)
+managers    = replaceNAsManagers(managers, gameLogs, False)
+pitchings   = replaceNAsPitching(pitchings, gameLogs, False)
+battings    = replaceNAsBatting(battings, gameLogs, False)
+fieldings   = replaceNAsFielding(fieldings, gameLogs, False)
 yearIndicators = [teams, managers, fieldings, pitchings, battings]
 
 minYears = []
