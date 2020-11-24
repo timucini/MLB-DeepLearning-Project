@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def load(path, dt=False):
+def load(path, dt=False, stats=False):
     print("loading data from",path)
     dataFrames = {}
     dataFrames['gameLogs']  = pd.read_csv(path+r'\GameLogs.csv', index_col=False)
@@ -13,10 +13,12 @@ def load(path, dt=False):
     dataFrames['fieldings'] = pd.read_csv(path+r'\Fielding.csv', index_col=False)
     dataFrames['pitchings'] = pd.read_csv(path+r'\Pitching.csv', index_col=False)
     dataFrames['battings']  = pd.read_csv(path+r'\Batting.csv', index_col=False)
+    if stats:
+        dataFrames['stats']  = pd.read_csv(path+r'\Stats.csv', index_col=False)
     print("data loaded")
     return dataFrames
 
-def save(path, dataFrames):
+def save(path, dataFrames, stats=False):
     print("Saving data to",path)
     dataFrames['gameLogs'].to_csv(path+r'\GameLogs.csv', index = False)
     dataFrames['people'].to_csv(path+r'\People.csv', index = False)
@@ -25,6 +27,8 @@ def save(path, dataFrames):
     dataFrames['fieldings'].to_csv(path+r'\Fielding.csv', index = False)
     dataFrames['pitchings'].to_csv(path+r'\Pitching.csv', index = False)
     dataFrames['battings'].to_csv(path+r'\Batting.csv', index = False)
+    if stats:
+        dataFrames['stats'].to_csv(path+r'\Stats.csv', index = False)
     print("Data saved")
 
 def filter(path, saveState=True):
@@ -41,7 +45,7 @@ def filter(path, saveState=True):
         gameLogs = gameLogs[gameLogs['Forfeit information'].isna()]
         gameLogs = gameLogs[gameLogs['Protest information'].isna()]
         generalColumns = [
-            'Date','Visiting team','Visiting league AL','Home team','Home league AL','Visiting score','Home score']
+            'Date','Visiting: Team','Visiting league AL','Home: Team','Home league AL','Visiting: Score','Home: Score']
         visitingStatsColumns = [
             'Visiting at-bats','Visiting hits','Visiting doubles','Visiting triples','Visiting homeruns','Visiting RBI','Visiting sacrifice hits','Visiting sacrifice flies',
             'Visiting hit-by-pitch','Visiting walks','Visiting intentional walks','Visiting strikeouts','Visiting stolen bases','Visiting caught stealing','Visiting grounded into double plays',
@@ -189,8 +193,6 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
     def replaceGameLogs(gameLogs, dropna=True):
         if dropna:
             gameLogs = gameLogs.dropna().reset_index(drop=True)
-        gameLogs['row'] = range(0,gameLogs.index.size)
-        gameLogs = gameLogs[(gameLogs.columns[-1:].tolist()+gameLogs.columns[:-1].tolist())]
         return gameLogs
     
     def replacePeople(people, gameLogs, default, dropna=True):
@@ -230,7 +232,7 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
     dataFrames['people']    = replacePeople(dataFrames['people'], dataFrames['gameLogs'], default)
     print("handeling NA in teams")
     dataFrames['teams']     = replaceFrame(dataFrames['teams'],
-        ['Home team', 'Visiting team']
+        ['Home: Team', 'Visiting: Team']
         , dataFrames['gameLogs'], default, lastKnownState, dropna)
     print("handeling NA in managers")
     dataFrames['managers']  = replaceFrame(dataFrames['managers'],
@@ -293,7 +295,7 @@ def asPerformance(path, dataFrames, saveState=True):
             -0.5*gameLogs['Visiting wild pitches']
             -0.25*gameLogs['Home hit-by-pitch']
             -0.25*gameLogs['Visiting balks']
-            -2*gameLogs['Home score']
+            -2*gameLogs['Home: Score']
             -0.75*gameLogs['Home sacrifice hits']
             -0.75*gameLogs['Home sacrifice flies']
             +3*gameLogs['Visiting grounded into double plays'])/64
@@ -307,13 +309,13 @@ def asPerformance(path, dataFrames, saveState=True):
             -0.5*gameLogs['Home wild pitches']
             -0.25*gameLogs['Visiting hit-by-pitch']
             -0.25*gameLogs['Home balks']
-            -2*gameLogs['Visiting score']
+            -2*gameLogs['Visiting: Score']
             -0.75*gameLogs['Visiting sacrifice hits']
             -0.75*gameLogs['Visiting sacrifice flies']
             +3*gameLogs['Home grounded into double plays'])/64
         gameLogs['Visiting: Batting performance'] = (0
             +0.5*gameLogs['Visiting at-bats']
-            +2*gameLogs['Visiting score']
+            +2*gameLogs['Visiting: Score']
             +1*gameLogs['Visiting hits']
             +2*gameLogs['Visiting doubles']
             +3*gameLogs['Visiting triples']
@@ -330,7 +332,7 @@ def asPerformance(path, dataFrames, saveState=True):
             -3*gameLogs['Home grounded into double plays'])/64
         gameLogs['Home: Batting performance'] = (0
             +0.5*gameLogs['Home at-bats']
-            +2*gameLogs['Home score']
+            +2*gameLogs['Home: Score']
             +1*gameLogs['Home hits']
             +2*gameLogs['Home doubles']
             +3*gameLogs['Home triples']
@@ -346,14 +348,15 @@ def asPerformance(path, dataFrames, saveState=True):
             +0.75*gameLogs['Home sacrifice flies']
             -3*gameLogs['Visiting grounded into double plays'])/64
         gameLogs['Visiting: Pythagorean expectation'] = (
-            gameLogs['Visiting score']**1.83)/(gameLogs['Visiting score']**1.83+gameLogs['Home score']**1.83)
+            gameLogs['Visiting: Score']**1.83)/(gameLogs['Visiting: Score']**1.83+gameLogs['Home: Score']**1.83)
         gameLogs['Home: Pythagorean expectation'] = (
-            gameLogs['Home score']**1.83)/(gameLogs['Home score']**1.83+gameLogs['Visiting score']**1.83)
+            gameLogs['Home: Score']**1.83)/(gameLogs['Home: Score']**1.83+gameLogs['Visiting: Score']**1.83)
         gameLogs['Visiting: BABIP'] = (
             (gameLogs['Visiting hits']-gameLogs['Visiting homeruns'])/(gameLogs['Visiting at-bats']-gameLogs['Visiting strikeouts']-gameLogs['Visiting homeruns']+gameLogs['Visiting sacrifice flies']))
         gameLogs['Home: BABIP'] = (
             (gameLogs['Home hits']-gameLogs['Home homeruns'])/(gameLogs['Home at-bats']-gameLogs['Home strikeouts']-gameLogs['Home homeruns']+gameLogs['Home sacrifice flies']))
-        return gameLogs[['Date','Visiting team','Visiting league AL','Home team','Home league AL','Visiting score','Home score',
+        gameLogs['League Diffrence'] = gameLogs['Home league AL'].astype('int32')-gameLogs['Visiting league AL'].astype('int32')
+        return gameLogs[['Date','Visiting: Team','Home: Team','Visiting: Score','Home: Score','League Diffrence',
             'Visiting: Fielding perfomance','Home: Fielding perfomance','Visiting: Pitching performance','Home: Pitching performance',
             'Visiting: Batting performance','Home: Batting performance','Visiting: Pythagorean expectation','Home: Pythagorean expectation',
             'Visiting: BABIP','Home: BABIP',
@@ -518,12 +521,12 @@ def merge(path, dataFrames, saveState=True):
         return merged
 
     def mergeTeams(teams, gameLogs):
-        teamLogs = gameLogs[['Visiting team','Home team']]
+        teamLogs = gameLogs[['Visiting: Team','Home: Team']]
         teamLogs['yearID'] = gameLogs['Date'].dt.year-1
         merged = pd.DataFrame()
         for teamColumn in teams.drop(columns=['teamID','yearID']):
-            merged['Visiting: Team - '+teamColumn] = pd.merge(teamLogs, teams[['teamID','yearID',teamColumn]], left_on=['yearID','Visiting team'], right_on=['yearID', 'teamID'], how="left")[teamColumn]
-            merged['Home: Team - '+teamColumn] = pd.merge(teamLogs, teams[['teamID','yearID',teamColumn]], left_on=['yearID','Home team'], right_on=['yearID', 'teamID'], how="left")[teamColumn]
+            merged['Visiting: Team - '+teamColumn] = pd.merge(teamLogs, teams[['teamID','yearID',teamColumn]], left_on=['yearID','Visiting: Team'], right_on=['yearID', 'teamID'], how="left")[teamColumn]
+            merged['Home: Team - '+teamColumn] = pd.merge(teamLogs, teams[['teamID','yearID',teamColumn]], left_on=['yearID','Home: Team'], right_on=['yearID', 'teamID'], how="left")[teamColumn]
         return merged
 
     def mergePitchings(pitchings, gameLogs):
@@ -543,6 +546,56 @@ def merge(path, dataFrames, saveState=True):
             merged['Visiting: Manager - '+managerColumn] = pd.merge(teamLogs, managers[['playerID','yearID',managerColumn]], left_on=['yearID','Visiting team manager ID'], right_on=['yearID', 'playerID'], how="left")[managerColumn]
             merged['Home: Manager - '+managerColumn] = pd.merge(teamLogs, managers[['playerID','yearID',managerColumn]], left_on=['yearID','Home team manager ID'], right_on=['yearID', 'playerID'], how="left")[managerColumn]
         return merged
+    
+    def createRollingStats(gameLogs, toRollVisiting=[], toRollHome=[], vsWindow=5, generalWindow=10):
+        def getTeamPart(teamColumn ,fromFrame):
+            teams = []
+            for team in fromFrame[teamColumn].unique():
+                teams.append(fromFrame[fromFrame[teamColumn]==team])
+            return teams
+
+        def getRollingMean(target ,team, window):
+            return team.loc[:,target].rolling(window).mean().shift(1)
+
+        def getValues(targetTeamType, teams, columns, vsWindow, generalWindow):
+            teamColumns = []
+            versusColumns = []
+            versus = []
+            for team in teams:
+                for column in columns:
+                    newColumn = column + ' ratio'
+                    teamColumns.append(newColumn)
+                    team[newColumn] = getRollingMean(column, team, generalWindow)
+                tempvs = getTeamPart(targetTeamType, team)
+                for vsteam in tempvs:
+                    for column in columns:
+                        newColumn = column + ' versus ratio'
+                        versusColumns.append(newColumn)
+                        vsteam[newColumn] = getRollingMean(column, vsteam, vsWindow)
+                versus.append(pd.concat(tempvs))
+            return pd.merge(pd.concat(teams)[['row']+list(dict.fromkeys(teamColumns))], pd.concat(versus)[['row']+list(dict.fromkeys(versusColumns))], on='row')
+
+        gameLogs = gameLogs[['Visiting: Team','Home: Team','Visiting: Score','Home: Score','League Diffrence']+toRollVisiting+toRollHome]
+        gameLogs['Home: Win'] = gameLogs['Home: Score']>gameLogs['Visiting: Score']
+        gameLogs['Home: Odd'] = (gameLogs['Home: Score'].replace(0,1))/(gameLogs['Visiting: Score'].replace(0,1))
+        gameLogs['Visiting: Win'] = gameLogs['Visiting: Score']>gameLogs['Home: Score']
+        gameLogs['Visiting: Odd'] = (gameLogs['Visiting: Score'].replace(0,1))/(gameLogs['Home: Score'].replace(0,1))
+        gameLogs['row'] = range(0,gameLogs.index.size)
+
+        toRollVisiting = ['Visiting: Score','Visiting: Win','Visiting: Odd']+toRollVisiting
+        toRollHome = ['Home: Score','Home: Win','Home: Odd']+toRollHome
+
+        visiting = gameLogs[['row','Visiting: Team','Home: Team']+toRollVisiting]
+        home = gameLogs[['row','Visiting: Team','Home: Team']+toRollHome]
+
+        visitings = getValues('Home: Team', getTeamPart('Visiting: Team', visiting), toRollVisiting, vsWindow, generalWindow)
+        homes = getValues('Visiting: Team', getTeamPart('Home: Team', home), toRollHome, vsWindow, generalWindow)        
+        teams = pd.merge(visitings, homes, on='row').sort_values('row').reset_index(drop=True)
+        teams = pd.merge(gameLogs[['row','League Diffrence']], teams, on='row').drop(columns='row')
+        for column in teams.columns:
+            teams[column] = teams[column].fillna(teams[column].mean())
+        return teams
+
     print("start merging")
     print("merge people")
     dataFrames['people'] = mergePeople(dataFrames['people'], dataFrames['gameLogs'])
@@ -569,9 +622,11 @@ def merge(path, dataFrames, saveState=True):
         'Home starting player 4 ID','Home starting player 5 ID','Home starting player 6 ID',
         'Home starting player 7 ID','Home starting player 8 ID','Home starting player 9 ID'])
     print("merging complete")
+    print("creating rolling stats")
+    dataFrames['stats'] = createRollingStats(dataFrames['gameLogs'])
     print("dropping ID columns")
     dataFrames['gameLogs'] = dataFrames['gameLogs'].drop(columns=[
-        'Visiting team manager ID','Visiting starting pitcher ID',
+        'Visiting team manager ID','Visiting starting pitcher ID','League Diffrence',
         'Visiting starting player 1 ID','Visiting starting player 2 ID','Visiting starting player 3 ID',
         'Visiting starting player 4 ID','Visiting starting player 5 ID','Visiting starting player 6 ID',
         'Visiting starting player 7 ID','Visiting starting player 8 ID','Visiting starting player 9 ID',
@@ -579,18 +634,14 @@ def merge(path, dataFrames, saveState=True):
         'Home starting player 1 ID','Home starting player 2 ID','Home starting player 3 ID',
         'Home starting player 4 ID','Home starting player 5 ID','Home starting player 6 ID',
         'Home starting player 7 ID','Home starting player 8 ID','Home starting player 9 ID'])
+    
     if saveState:
-        save(path+r'\Merged', dataFrames)
+        save(path+r'\Merged', dataFrames, stats=True)
     return dataFrames
 
-#def createMeans():
-
 path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+#data = load(path+r'\Performance', True)
 data = filter(path)
 data = replace(path, data)
 data = asPerformance(path, data)
-#data = load(path+r'\Performance', True)
 data = merge(path, data)
-#for frame in data:
-#    print(frame)
-#    print(data[frame])
