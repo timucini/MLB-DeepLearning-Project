@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 import numpy as np
 from datetime import datetime as dt
 
@@ -120,7 +121,7 @@ def filterTeams(teams, dropna=True):
     #Returning teams
     return teams.reset_index(drop=True)
 #Loading data
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 gameLogs    = pd.read_csv(path+r'\Input\GameLogs.csv', index_col=False)
 people      = pd.read_csv(path+r'\Input\People.csv', index_col=False)
 teams       = pd.read_csv(path+r'\Input\Teams.csv', index_col=False)

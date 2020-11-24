@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from datetime import datetime as dt
 
 def mergePeople(IDColumn, gameLogs, people):
@@ -11,7 +12,7 @@ def mergePeople(IDColumn, gameLogs, people):
     merged = merged.rename(columns=newColumns)
     return merged[['row']+list(newColumns.values())]
 
-path = r'C:\Users\DonBrezz\Documents\GitHub\MLB-DeepLearning-Project'
+path = Path
 people = pd.read_csv(path+r'\Filtered\_mlb_filtered_People.csv', index_col=False)
 gameLogs = pd.read_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index_col=False)
 

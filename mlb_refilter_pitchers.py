@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def refilterPitchers():
     path = r'/Users/sewerynkozlowski/Desktop/HTW_2_Semester/Analytische Anwendungen/MLB-DeepLearning-Project/Remerged/'
     pitchers = pd.read_csv(r'/Users/sewerynkozlowski/Desktop/HTW_2_Semester/Analytische Anwendungen/MLB-DeepLearning-Project/Remerged/mlb_remerged_Pitchers22.csv', index_col=False)

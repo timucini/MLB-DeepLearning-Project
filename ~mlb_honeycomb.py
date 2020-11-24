@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 import math
 
 import tensorflow as tf
@@ -7,7 +8,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Average, LSTM
 from tensorflow.keras.callbacks import EarlyStopping
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 targets     = pd.read_csv(path+r'\_mlb_targets.csv', index_col=False)[-40000:]
 predictors  = pd.read_csv(path+r'\_mlb_predictors.csv', index_col=False, dtype="float32")[-40000:]
 

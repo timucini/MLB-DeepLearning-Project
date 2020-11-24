@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 import numpy as np
 
 def getTeams(teamColumn ,gameLogs):
@@ -25,7 +26,7 @@ def getOddRatio(teamType, team, window=10):
     else:
         return (1/team.loc[:,'Home team odd']).rolling(window).mean().shift(1)
 
-path = r'C:\Users\DonBrezz\Documents\GitHub\MLB-DeepLearning-Project'
+path = Path
 gameLogs = pd.read_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index_col=False)
 
 gameLogs = gameLogs[['row','Visiting team','Home team','Visiting score','Home score']]

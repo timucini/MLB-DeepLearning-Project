@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 import numpy as np
 from datetime import datetime as dt
 
@@ -8,7 +9,7 @@ def mergeSalaries(IDColumn, gameLogs, salaries):
     merged = merged.rename(columns={"salary":newCol})
     return merged[['row',newCol]]
 
-path = r'C:\Users\DonBrezz\Documents\GitHub\MLB-DeepLearning-Project'
+path = Path
 salaries = pd.read_csv(path+r'\Filtered\_mlb_filtered_Salaries.csv', index_col=False)
 gameLogs = pd.read_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index_col=False)
 

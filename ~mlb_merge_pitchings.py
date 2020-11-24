@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 import numpy as np
 from datetime import datetime as dt
 
@@ -21,7 +22,7 @@ def mergePitchers(visitingPitchers, homePitchers):
     return mergedPitchers
 
 
-path = r'/Users/sewerynkozlowski/Desktop/HTW_2_Semester/Analytische Anwendungen/MLB-DeepLearning-Project/MLB-DeepLearning-Project'
+path = Path
 pitchers = pd.read_csv(path+r'/Filtered/_mlb_filtered_Pitching.csv', index_col=False)
 gameLogs = pd.read_csv(path+r'/Filtered/_mlb_filtered_GameLogs.csv', index_col=False)
 

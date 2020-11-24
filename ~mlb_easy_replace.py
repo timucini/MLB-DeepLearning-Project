@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 import datetime
 
 def replaceNAsManagers(managers, gameLogs, default=True):
@@ -162,7 +163,7 @@ def encodeGames(gameLogs, minYear):
     gameLogs = gameLogs[(gameLogs.columns[-1:].tolist()+gameLogs.columns[:-1].tolist())]
     return gameLogs
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 gameLogs    = pd.read_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index_col=False)
 people      = pd.read_csv(path+r'\Filtered\_mlb_filtered_People.csv', index_col=False)
 teams       = pd.read_csv(path+r'\Filtered\_mlb_filtered_Teams.csv', index_col=False)

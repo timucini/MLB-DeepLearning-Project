@@ -1,7 +1,8 @@
 import pandas as pd
+from pathlib import Path
 import numpy as np
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 scorings    = pd.read_csv(path+r'\Merged\_mlb_created_scoring.csv', index_col=False)
 people      = pd.read_csv(path+r'\Merged\_mlb_merged_People.csv', index_col=False)
 teams       = pd.read_csv(path+r'\Merged\_mlb_merged_Teams.csv', index_col=False)

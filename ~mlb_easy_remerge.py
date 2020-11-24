@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from datetime import datetime as dt
 
 def mergeManagers(managers, gameLogs):
@@ -102,7 +103,7 @@ def mergeBattings(battings, gameLogs):
     print("Merged Battings. Checksum: ", gameLogs.index.size==merged.index.size, gameLogs.index.size, merged.index.size)
     return merged
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 gameLogs    = pd.read_csv(path+r'\Replaced\_mlb_encoded_GameLogs.csv', index_col=False)
 people      = pd.read_csv(path+r'\Replaced\_mlb_encoded_People.csv', index_col=False)
 teams       = pd.read_csv(path+r'\Replaced\_mlb_replaced_Teams.csv', index_col=False)

@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 
 def load(path, dt=False, stats=False):
     print("loading data from",path)
@@ -639,7 +640,7 @@ def merge(path, dataFrames, saveState=True):
         save(path+r'\Merged', dataFrames, stats=True)
     return dataFrames
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 #data = load(path+r'\Performance', True)
 data = filter(path)
 data = replace(path, data)

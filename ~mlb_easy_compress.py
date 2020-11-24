@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 def compressManagers(managers):
     compressed = pd.DataFrame(managers['row'])
@@ -53,7 +54,7 @@ def compressPeople(people):
         compressed[t+': People - Average player throws right'] = throwsRight.mean(axis=1)
     return compressed
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 #stats       = pd.read_csv(path+r'\Remerged\_mlb_game_stats.csv', index_col=False)
 people      = pd.read_csv(path+r'\Remerged\_mlb_remerged_People.csv', index_col=False)
 #teams       = pd.read_csv(path+r'\Remerged\_mlb_remerged_Teams.csv', index_col=False)

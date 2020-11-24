@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 import numpy as np
 from datetime import datetime as dt
 
@@ -21,7 +22,7 @@ def mergeManagers(visitingManagers, homeManagers):
     return mergedManagers
 
 
-path = r'C:\Users\DonBrezz\Documents\GitHub\MLB-DeepLearning-Project'
+path = Path
 managers = pd.read_csv(path+r'\Filtered\_mlb_filtered_Managers.csv', index_col=False)
 gameLogs = pd.read_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index_col=False)
 managers = managers.groupby(['yearID','playerID'], as_index=False)['Games','Wins','Losses'].sum()

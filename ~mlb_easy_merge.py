@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from datetime import datetime as dt
 
 def mergeManagers(managers, gameLogs):
@@ -189,7 +190,7 @@ def mergeBattings(battings, gameLogs):
         mergedBattings = pd.merge(mergedBattings, playerData, how="left", on='row')
     return mergedBattings
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 gameLogs    = pd.read_csv(path+r'\Filtered\_mlb_filtered_GameLogs.csv', index_col=False)
 people      = pd.read_csv(path+r'\Filtered\_mlb_filtered_People.csv', index_col=False)
 teams       = pd.read_csv(path+r'\Filtered\_mlb_filtered_Teams.csv', index_col=False)

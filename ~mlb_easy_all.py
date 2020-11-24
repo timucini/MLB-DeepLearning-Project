@@ -1,7 +1,8 @@
 import pandas as pd
+from pathlib import Path
 import numpy as np
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 stats       = pd.read_csv(path+r'\Remerged\_mlb_game_stats.csv', index_col=False)
 people      = pd.read_csv(path+r'\Remerged\_mlb_remerged_People.csv', index_col=False)
 teams       = pd.read_csv(path+r'\Remerged\_mlb_remerged_Teams.csv', index_col=False)

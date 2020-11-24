@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 
 def mergeStartingPlayers(player, gameLogs, homeOrVisiting, playerNumber):
 
@@ -40,7 +41,7 @@ def mergeAllFrames(fieldings, gameLogs):
     merge19 = pd.merge(merge18, merge9, how="left", on="row")
     merge19.to_csv(path + r'\Merged\_mlb_merged_Fieldings.csv', index=False)
 
-path = r'/Users/sewerynkozlowski/Desktop/HTW_2_Semester/Analytische Anwendungen/MLB-DeepLearning-Project/MLB-DeepLearning-Project'
+path = Path
 fieldings = pd.read_csv(path+r'/Filtered/_mlb_filtered_Fielding.csv', index_col=False)
 gameLogs = pd.read_csv(path+r'/Filtered/_mlb_filtered_GameLogs.csv', index_col=False)
 

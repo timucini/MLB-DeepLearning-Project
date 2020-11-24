@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 import numpy as np
 from datetime import datetime
 
@@ -29,7 +30,7 @@ def getValues(targetTeamType, teams, columns):
         versus.append(pd.concat(tempvs))
     return pd.merge(pd.concat(teams)[['row']+list(dict.fromkeys(teamColumns))], pd.concat(versus)[['row']+list(dict.fromkeys(versusColumns))], on='row')
 
-path = r'F:\Dokumente\HTW\2. Semester\Analytische Anwendungen\Projekt'
+path = Path
 gameLogs = pd.read_csv(path+r'\Replaced\_mlb_encoded_GameLogs.csv', index_col=False)
 
 gameLogs['Home team win'] = gameLogs['Home score']>gameLogs['Visiting score']
