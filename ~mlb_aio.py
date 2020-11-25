@@ -5,31 +5,31 @@ from pathlib import Path
 def load(path, dt=False, stats=False):
     print("loading data from",path)
     dataFrames = {}
-    dataFrames['gameLogs']  = pd.read_csv(path+r'\GameLogs.csv', index_col=False)
+    dataFrames['gameLogs']  = pd.read_csv(path/'GameLogs.csv', index_col=False)
     if dt:
         dataFrames['gameLogs']['Date'] = pd.to_datetime(dataFrames['gameLogs']['Date'])
-    dataFrames['people']    = pd.read_csv(path+r'\People.csv', index_col=False)
-    dataFrames['teams']     = pd.read_csv(path+r'\Teams.csv', index_col=False)
-    dataFrames['managers']  = pd.read_csv(path+r'\Managers.csv', index_col=False)
-    dataFrames['fieldings'] = pd.read_csv(path+r'\Fielding.csv', index_col=False)
-    dataFrames['pitchings'] = pd.read_csv(path+r'\Pitching.csv', index_col=False)
-    dataFrames['battings']  = pd.read_csv(path+r'\Batting.csv', index_col=False)
+    dataFrames['people']    = pd.read_csv(path/'People.csv', index_col=False)
+    dataFrames['teams']     = pd.read_csv(path/'Teams.csv', index_col=False)
+    dataFrames['managers']  = pd.read_csv(path/'Managers.csv', index_col=False)
+    dataFrames['fieldings'] = pd.read_csv(path/'Fielding.csv', index_col=False)
+    dataFrames['pitchings'] = pd.read_csv(path/'Pitching.csv', index_col=False)
+    dataFrames['battings']  = pd.read_csv(path/'Batting.csv', index_col=False)
     if stats:
-        dataFrames['stats']  = pd.read_csv(path+r'\Stats.csv', index_col=False)
+        dataFrames['stats']  = pd.read_csv(path/'Stats.csv', index_col=False)
     print("data loaded")
     return dataFrames
 
 def save(path, dataFrames, stats=False):
     print("Saving data to",path)
-    dataFrames['gameLogs'].to_csv(path+r'\GameLogs.csv', index = False)
-    dataFrames['people'].to_csv(path+r'\People.csv', index = False)
-    dataFrames['teams'].to_csv(path+r'\Teams.csv', index = False)
-    dataFrames['managers'].to_csv(path+r'\Managers.csv', index = False)
-    dataFrames['fieldings'].to_csv(path+r'\Fielding.csv', index = False)
-    dataFrames['pitchings'].to_csv(path+r'\Pitching.csv', index = False)
-    dataFrames['battings'].to_csv(path+r'\Batting.csv', index = False)
+    dataFrames['gameLogs'].to_csv(path/'GameLogs.csv', index = False)
+    dataFrames['people'].to_csv(path/'People.csv', index = False)
+    dataFrames['teams'].to_csv(path/'Teams.csv', index = False)
+    dataFrames['managers'].to_csv(path/'Managers.csv', index = False)
+    dataFrames['fieldings'].to_csv(path/'Fielding.csv', index = False)
+    dataFrames['pitchings'].to_csv(path/'Pitching.csv', index = False)
+    dataFrames['battings'].to_csv(path/'Batting.csv', index = False)
     if stats:
-        dataFrames['stats'].to_csv(path+r'\Stats.csv', index = False)
+        dataFrames['stats'].to_csv(path/'Stats.csv', index = False)
     print("Data saved")
 
 def filter(path, saveState=True):
@@ -104,7 +104,7 @@ def filter(path, saveState=True):
         return teams.reset_index(drop=True)
 
     print("start filtering")
-    dataFrames = load(path+r'\Input')
+    dataFrames = load(path/'Input')
     print("filter gameLogs")
     dataFrames['gameLogs']  = filterGameLogs(dataFrames['gameLogs'], dataFrames['people'])
     print("filter people")
@@ -132,7 +132,7 @@ def filter(path, saveState=True):
         ,"BB":"Base on balls","SO":"Strikeouts","IBB":"Intentional walks","HBP":"Hit by pitch","SH":"Sacrifice hits","SF":"Sacrifice flies","GIDP":"Grounded into double plays"})
     print("data filtered")
     if saveState:
-        save(path+r'\Filtered', dataFrames)
+        save(path/'Filtered', dataFrames)
     return dataFrames
 
 def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, saveState=True):
@@ -263,7 +263,7 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
         , dataFrames['gameLogs'], default, lastKnownState, dropna)
     print("NAs handeled")
     if saveState:
-        save(path+r'\Replaced', dataFrames)
+        save(path/'Replaced', dataFrames)
     return dataFrames
 
 def asPerformance(path, dataFrames, saveState=True):
@@ -458,7 +458,7 @@ def asPerformance(path, dataFrames, saveState=True):
     print("performances created")
 
     if saveState:
-        save(path+r'\Performance', dataFrames)
+        save(path/'Performance', dataFrames)
     return dataFrames
     
 def merge(path, dataFrames, saveState=True):
@@ -637,11 +637,12 @@ def merge(path, dataFrames, saveState=True):
         'Home starting player 7 ID','Home starting player 8 ID','Home starting player 9 ID'])
     
     if saveState:
-        save(path+r'\Merged', dataFrames, stats=True)
+        save(path/'Merged', dataFrames, stats=True)
     return dataFrames
 
-path = Path
-#data = load(path+r'\Performance', True)
+path = Path(__file__).parent.absolute()
+print(path)
+#data = load(path/'Performance', True)
 data = filter(path)
 data = replace(path, data)
 data = asPerformance(path, data)
