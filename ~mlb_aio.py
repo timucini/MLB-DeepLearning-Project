@@ -135,8 +135,8 @@ def filter(path, saveState=True):
         save(path/'Filtered', dataFrames)
     return dataFrames
 
-def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, saveState=True, inpurity=0.5):
-    def replaceFrame(frame, targets, gameLogs, default, lastKnownState, dropna, inpurity):
+def replace(path, dataFrames, default="mean", lastKnownState=True, saveState=True, inpurity=0.5):
+    def replaceFrame(frame, targets, gameLogs, default, lastKnownState, inpurity):
         #define ID column
         mID = 'playerID'
         for column in frame.columns:
@@ -183,10 +183,14 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
         if lastKnownState:
             fullFrame = pd.merge(fullFrame[['yearID',mID]], fullFrame.groupby([mID]).ffill().drop(columns=['yearID']), left_index=True, right_index=True)
         frame = pd.merge(onlyFrame, fullFrame, on=['yearID',mID], how="left")
-        if default!=None:
+        nanFrame = frame.isna().sum().reset_index()
+        nanFrame['inpurity'] = nanFrame[0]/frame.index.size
+        while (not (nanFrame[nanFrame['inpurity']>inpurity/4])['index'].tolist())==False:
+            frame = frame[frame[nanFrame.at[nanFrame['inpurity'].idxmax(), 'index']].notna()]
             nanFrame = frame.isna().sum().reset_index()
             nanFrame['inpurity'] = nanFrame[0]/frame.index.size
-            for column in (nanFrame[nanFrame['inpurity']<=inpurity/8])['index'].tolist():
+        if default!=None:
+            for column in frame.columns:
                 if frame[column].dtype=="bool":
                     frame[column].fillna(False)
                     continue
@@ -199,16 +203,12 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
         #nanFrame = frame.isna().sum().reset_index()
         #nanFrame['inpurity'] = nanFrame[0]/frame.index.size
         #print(nanFrame[nanFrame['inpurity']>0])
-        if dropna:
-            return frame.dropna().reset_index(drop=True)
-        return frame.reset_index(drop=True)
+        return frame.dropna().reset_index(drop=True)
 
-    def replaceGameLogs(gameLogs, dropna=True):
-        if dropna:
-            gameLogs = gameLogs.dropna().reset_index(drop=True)
-        return gameLogs
+    def replaceGameLogs(gameLogs):
+        return gameLogs.dropna().reset_index(drop=True)
     
-    def replacePeople(people, gameLogs, default, dropna=True):
+    def replacePeople(people, gameLogs, default):
         columns = ['Visiting team manager ID','Visiting starting pitcher ID'
             ,'Visiting starting player 1 ID','Visiting starting player 2 ID','Visiting starting player 3 ID'
             ,'Visiting starting player 4 ID','Visiting starting player 5 ID','Visiting starting player 6 ID'
@@ -223,6 +223,12 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
             temp = temp.rename(columns={column:'playerID'})
             onlyPeople = pd.concat([onlyPeople, temp]).drop_duplicates().dropna().reset_index(drop=True)
         people = pd.merge(onlyPeople, people, on='playerID', how="left")
+        nanFrame = people.isna().sum().reset_index()
+        nanFrame['inpurity'] = nanFrame[0]/people.index.size
+        while (not (nanFrame[nanFrame['inpurity']>inpurity/4])['index'].tolist())==False:
+            people = people[people[nanFrame.at[nanFrame['inpurity'].idxmax(), 'index']].notna()]
+            nanFrame = people.isna().sum().reset_index()
+            nanFrame['inpurity'] = nanFrame[0]/people.index.size
         if default!=None:
             for column in people.columns:
                 if people[column].dtype=="bool":
@@ -233,10 +239,8 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
                         people[column] = people[column].fillna(people[column].mean())
                 elif default=="zero":
                     if (people[column].dtype=="float64") | (people[column].dtype=="int64"):
-                        people[column] = people[column].fillna(0)                
-        if dropna:
-            return people.dropna().reset_index(drop=True)
-        return people.reset_index(drop=True)
+                        people[column] = people[column].fillna(0)
+        return people.dropna().reset_index(drop=True)
 
     print("start handeling NAs")
     print("handeling NA in gameLogs")
@@ -246,11 +250,11 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
     print("handeling NA in teams")
     dataFrames['teams']     = replaceFrame(dataFrames['teams'],
         ['Home: Team', 'Visiting: Team']
-        , dataFrames['gameLogs'], default, lastKnownState, dropna, inpurity)
+        , dataFrames['gameLogs'], default, lastKnownState, inpurity)
     print("handeling NA in managers")
     dataFrames['managers']  = replaceFrame(dataFrames['managers'],
         ['Home team manager ID', 'Visiting team manager ID']
-        , dataFrames['gameLogs'], default, lastKnownState, dropna, inpurity)
+        , dataFrames['gameLogs'], default, lastKnownState, inpurity)
     print("handeling NA in fieldings")
     dataFrames['fieldings'] = replaceFrame(dataFrames['fieldings'],
         ['Visiting starting player 1 ID','Visiting starting player 2 ID','Visiting starting player 3 ID'
@@ -259,11 +263,11 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
         ,'Home starting player 1 ID','Home starting player 2 ID','Home starting player 3 ID'
         ,'Home starting player 4 ID','Home starting player 5 ID','Home starting player 6 ID'
         ,'Home starting player 7 ID','Home starting player 8 ID','Home starting player 9 ID']
-        , dataFrames['gameLogs'], default, lastKnownState, dropna, inpurity)
+        , dataFrames['gameLogs'], default, lastKnownState, inpurity)
     print("handeling NA in pitchings")
     dataFrames['pitchings'] = replaceFrame(dataFrames['pitchings'],
         ['Home starting pitcher ID', 'Visiting starting pitcher ID']
-        , dataFrames['gameLogs'], default, lastKnownState, dropna, inpurity)
+        , dataFrames['gameLogs'], default, lastKnownState, inpurity)
     print("handeling NA in battings")
     dataFrames['battings']  = replaceFrame(dataFrames['battings'],
         ['Visiting starting player 1 ID','Visiting starting player 2 ID','Visiting starting player 3 ID'
@@ -272,7 +276,7 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
         ,'Home starting player 1 ID','Home starting player 2 ID','Home starting player 3 ID'
         ,'Home starting player 4 ID','Home starting player 5 ID','Home starting player 6 ID'
         ,'Home starting player 7 ID','Home starting player 8 ID','Home starting player 9 ID']
-        , dataFrames['gameLogs'], default, lastKnownState, dropna, inpurity)
+        , dataFrames['gameLogs'], default, lastKnownState, inpurity)
     print("NAs handeled")
     if saveState:
         save(path/'Replaced', dataFrames)
@@ -692,12 +696,12 @@ def createView(columns, data):
 
 path = Path(__file__).parent.absolute()
 print(path)
-#data = filter(path)
-#data = replace(path, data)
+data = filter(path)
+data = replace(path, data)
 #data = load(path/'Replaced', True)
-#data = asPerformance(path, data)
-#data = merge(path, data)
-data = load(path/'Merged', dt=True, stats=True)
+data = asPerformance(path, data)
+data = merge(path, data)
+#data = load(path/'Merged', dt=True, stats=True)
 createLearningData(data, path)
 #createView(['Visiting: Average Fielding performance','Visiting: Fielding performance ratio','Visiting: Fielding performance versus ratio',
 #    'Home: Average Batting performance','Home: Batting performance ratio','Home: Batting performance versus ratio',
