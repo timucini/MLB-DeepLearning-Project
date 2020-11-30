@@ -268,6 +268,8 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, dropna=True, 
 
 def asPerformance(path, dataFrames, saveState=True):
     def asPerformanceGameLogs(gameLogs):
+        gameLogs['Visiting: Win'] = gameLogs['Visiting: Score']>gameLogs['Home: Score']
+        gameLogs['Home: Win'] = gameLogs['Visiting: Score']<gameLogs['Home: Score']
         gameLogs['Visiting: Fielding perfomance'] = (0
             +1.5*gameLogs['Visiting putouts']
             +1.25*gameLogs['Visiting assists']
@@ -357,7 +359,7 @@ def asPerformance(path, dataFrames, saveState=True):
         gameLogs['Home: BABIP'] = (
             (gameLogs['Home hits']-gameLogs['Home homeruns'])/(gameLogs['Home at-bats']-gameLogs['Home strikeouts']-gameLogs['Home homeruns']+gameLogs['Home sacrifice flies']))
         gameLogs['League Diffrence'] = gameLogs['Home league AL'].astype('int32')-gameLogs['Visiting league AL'].astype('int32')
-        return gameLogs[['Date','Visiting: Team','Home: Team','Visiting: Score','Home: Score','League Diffrence',
+        return gameLogs[['Date','Visiting: Team','Home: Team','Visiting: Score','Home: Score','Visiting: Win','Home: Win','League Diffrence',
             'Visiting: Fielding perfomance','Home: Fielding perfomance','Visiting: Pitching performance','Home: Pitching performance',
             'Visiting: Batting performance','Home: Batting performance','Visiting: Pythagorean expectation','Home: Pythagorean expectation',
             'Visiting: BABIP','Home: BABIP',
@@ -576,10 +578,8 @@ def merge(path, dataFrames, saveState=True):
                 versus.append(pd.concat(tempvs))
             return pd.merge(pd.concat(teams)[['row']+list(dict.fromkeys(teamColumns))], pd.concat(versus)[['row']+list(dict.fromkeys(versusColumns))], on='row')
 
-        gameLogs = gameLogs[['Visiting: Team','Home: Team','Visiting: Score','Home: Score','League Diffrence']+toRollVisiting+toRollHome]
-        gameLogs['Home: Win'] = gameLogs['Home: Score']>gameLogs['Visiting: Score']
+        gameLogs = gameLogs[['Visiting: Team','Home: Team','Visiting: Score','Home: Score','Visiting: Win','Home: Win','League Diffrence']+toRollVisiting+toRollHome]
         gameLogs['Home: Odd'] = (gameLogs['Home: Score'].replace(0,1))/(gameLogs['Visiting: Score'].replace(0,1))
-        gameLogs['Visiting: Win'] = gameLogs['Visiting: Score']>gameLogs['Home: Score']
         gameLogs['Visiting: Odd'] = (gameLogs['Visiting: Score'].replace(0,1))/(gameLogs['Home: Score'].replace(0,1))
         gameLogs['row'] = range(0,gameLogs.index.size)
 
@@ -624,7 +624,9 @@ def merge(path, dataFrames, saveState=True):
         'Home starting player 7 ID','Home starting player 8 ID','Home starting player 9 ID'])
     print("merging complete")
     print("creating rolling stats")
-    dataFrames['stats'] = createRollingStats(dataFrames['gameLogs'])
+    dataFrames['stats'] = createRollingStats(dataFrames['gameLogs'],
+        ['Visiting: Fielding perfomance','Visiting: Pitching performance','Visiting: Batting performance','Visiting: Pythagorean expectation','Visiting: BABIP'],
+        ['Home: Fielding perfomance','Home: Pitching performance','Home: Batting performance','Home: Pythagorean expectation','Home: BABIP'])
     print("dropping ID columns")
     dataFrames['gameLogs'] = dataFrames['gameLogs'].drop(columns=[
         'Visiting team manager ID','Visiting starting pitcher ID','League Diffrence',
