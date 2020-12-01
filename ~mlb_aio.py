@@ -666,7 +666,8 @@ def merge(path, dataFrames, saveState=True):
         save(path/'Merged', dataFrames, stats=True)
     return dataFrames
 
-def createLearningData(data, path, dropRowIndex=True):
+def createLearningData(data, path, operator="-", dropRowIndex=True):
+    path = path/'Learning'
     gameLogs = data.pop('gameLogs')
     predictors = gameLogs[['Row']]
     for frame in data:
@@ -674,7 +675,25 @@ def createLearningData(data, path, dropRowIndex=True):
         predictors = pd.merge(predictors, data[frame], on='Row', how="left")
     predictors = predictors.dropna()
     targets = pd.merge(predictors[['Row']], gameLogs, on='Row', how="left")
-    path = path/'Learning'
+    homes = []
+    visitings = {}
+    temp = pd.DataFrame()
+    for column in predictors.columns:
+        if column.find("Visiting")>-1:
+            visitings[column.replace("Visiting: ","")] = column.replace("Visiting: ","")
+        elif column.find("Home")>-1:
+            homes.append(column.replace("Home: ",""))
+        else:
+            temp[column] = predictors[column]
+    for homeCol in homes:
+        visitingCol = visitings.pop(homeCol)
+        if operator=="-":
+            temp[homeCol+" diffrence"] = predictors['Home: '+homeCol]-predictors['Visiting: '+visitingCol]
+        elif operator=="/":
+            temp[homeCol+" diffrence"] = predictors['Home: '+homeCol]/predictors['Visiting: '+visitingCol]
+        else:
+            temp[homeCol+" diffrence"] = predictors['Home: '+homeCol]>predictors['Visiting: '+visitingCol]
+    predictors = temp
     print("Saving data to",path)
     if dropRowIndex:
         predictors.drop(columns=['Row']).to_csv(path/'Predictors.csv', index = False)
@@ -696,12 +715,12 @@ def createView(columns, data):
 
 path = Path(__file__).parent.absolute()
 print(path)
-data = filter(path)
-data = replace(path, data)
+#data = filter(path)
+#data = replace(path, data)
 #data = load(path/'Replaced', True)
-data = asPerformance(path, data)
-data = merge(path, data)
-#data = load(path/'Merged', dt=True, stats=True)
+#data = asPerformance(path, data)
+#data = merge(path, data)
+data = load(path/'Merged', dt=True, stats=True)
 createLearningData(data, path)
 #createView(['Visiting: Average Fielding performance','Visiting: Fielding performance ratio','Visiting: Fielding performance versus ratio',
 #    'Home: Average Batting performance','Home: Batting performance ratio','Home: Batting performance versus ratio',

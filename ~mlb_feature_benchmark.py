@@ -9,12 +9,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping
 
-def load(path, columns=[], prez="float32"):
-    if not columns:
-        return pd.read_csv(path, index_col=False, dtype=prez)
-    else:
-        return pd.read_csv(path, index_col=False, dtype=prez, usecols=columns)
-
 def bench(trainTargets, trainPredictors, validationTargets, validationPredictors, size=(16,16), prediction="binary", dropout=True):
     bench = Sequential()
     bench.add(Dense(size[1], input_shape=(trainPredictors.columns.size,), activation='relu'))
@@ -50,28 +44,23 @@ def initGPU():
             print(e)
 
 def getPredictors(path):
-    predicors = {}
-    for file in (path/'Learning'/'Predictors').glob('*.csv'):
-        frame = load(file)
-        for column in frame.columns:
-            predicors[column] = file
-    return predicors
+    return pd.read_csv(path/'Learning'/'Predictors.csv', index_col=False, dtype="float32")
 
 def predictorsBench(path, validationSplit=0.1, maxDims=False):
     predictors = getPredictors(path)
     targets = getBinaryTargets(path)
     split = np.random.rand(len(targets))<=validationSplit
-    dims = len(predictors)
-    if (maxDims!=False) & (maxDims<=len(predictors)):
+    dims = predictors.columns.size
+    if (maxDims!=False) & (maxDims<=predictors.columns.size):
         dims = maxDims
     predictorSet = pd.DataFrame()
     for dim in range(1, dims+1):
         usedPredictors = []
         validationAccuracy = []
         validationLoss = []
-        for predictor in predictors.keys():
+        for predictor in predictors.columns:
             usedPredictors.append(predictor)
-            tempSet = pd.concat([predictorSet, load(predictors[predictor], [predictor])], axis=1)
+            tempSet = pd.concat([predictorSet, predictors[predictor]], axis=1)
             print(tempSet.columns)
             start = datetime.now()
             benchmark = bench(targets[~split], tempSet[~split], targets[split], tempSet[split])
@@ -81,9 +70,9 @@ def predictorsBench(path, validationSplit=0.1, maxDims=False):
         frame = pd.DataFrame({"Predictors":usedPredictors,"Dimension":dim,"Accuracies":validationAccuracy,"Losses":validationLoss})
         frame['Score'] = frame['Accuracies']/frame['Losses']
         predictor = frame.at[frame['Score'].idxmax(),'Predictors']
-        predictorSet = pd.concat([predictorSet, load(predictors[predictor], [predictor])], axis=1)
-        predictors.pop(predictor, None)
-        frame.to_csv(path/('bench_'+str(dim)+'_'+predictor.replace(':','')+'.csv'), index=False)
+        predictorSet = pd.concat([predictorSet, predictors[predictor]], axis=1)
+        predictors.drop(columns=[predictor])
+        frame.to_csv(path/'Learning'/'Benchmark'/(str(dim)+'_'+predictor.replace(':','')+'.csv'), index=False)
 
 def validate(model, predictors, targets):
     frame = pd.DataFrame()
@@ -92,8 +81,7 @@ def validate(model, predictors, targets):
     return (frame['Targets']!=frame['Predictions']).sum()/frame.index.size
 
 def getBinaryTargets(path):
-    targets = load(path/'Learning'/'Targets'/'GameLogs.csv', ['Visiting: Score','Home: Score'])
-    return targets['Home: Score']>targets['Visiting: Score']
+    return pd.read_csv(path/'Learning'/'Targets.csv', dtype="float32", usecols=['Home: Win'])
 
 path = Path(__file__).parent.absolute()
 initGPU()
