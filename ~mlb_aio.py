@@ -292,19 +292,21 @@ def asPerformance(path, dataFrames, saveState=True):
             +1.25*gameLogs['Visiting assists']
             +2.25*gameLogs['Visiting double plays']
             -2*gameLogs['Visiting errors']
-            -0.75*gameLogs['Visiting passed balls']
-            -0.75*gameLogs['Visiting wild pitches']
-            -1.5*gameLogs['Home stolen bases']
-            +3.5*gameLogs['Visiting caught stealing'])/64
+            #-0.75*gameLogs['Visiting passed balls']
+            #-0.75*gameLogs['Visiting wild pitches']
+            #-1.5*gameLogs['Home stolen bases']
+            #+3.5*gameLogs['Visiting caught stealing']
+            )
         gameLogs['Home: Fielding performance'] = (0
             +1.5*gameLogs['Home putouts']
             +1.25*gameLogs['Home assists']
             +2.25*gameLogs['Home double plays']
             -2*gameLogs['Home errors']
-            -0.75*gameLogs['Home passed balls']
-            -0.75*gameLogs['Home wild pitches']
-            -1.5*gameLogs['Visiting stolen bases']
-            +3.5*gameLogs['Home caught stealing'])/64
+            #-0.75*gameLogs['Home passed balls']
+            #-0.75*gameLogs['Home wild pitches']
+            #-1.5*gameLogs['Visiting stolen bases']
+            #+3.5*gameLogs['Home caught stealing']
+            )
         gameLogs['Visiting: Pitching performance'] = (0
             -1*gameLogs['Home hits']
             -2*gameLogs['Home team earned runs']
@@ -318,7 +320,7 @@ def asPerformance(path, dataFrames, saveState=True):
             -2*gameLogs['Home: Score']
             -0.75*gameLogs['Home sacrifice hits']
             -0.75*gameLogs['Home sacrifice flies']
-            +3*gameLogs['Visiting grounded into double plays'])/64
+            +3*gameLogs['Visiting grounded into double plays'])
         gameLogs['Home: Pitching performance'] = (0
             -1*gameLogs['Visiting hits']
             -2*gameLogs['Visiting team earned runs']
@@ -332,7 +334,7 @@ def asPerformance(path, dataFrames, saveState=True):
             -2*gameLogs['Visiting: Score']
             -0.75*gameLogs['Visiting sacrifice hits']
             -0.75*gameLogs['Visiting sacrifice flies']
-            +3*gameLogs['Home grounded into double plays'])/64
+            +3*gameLogs['Home grounded into double plays'])
         gameLogs['Visiting: Batting performance'] = (0
             +0.5*gameLogs['Visiting at-bats']
             +2*gameLogs['Visiting: Score']
@@ -349,7 +351,7 @@ def asPerformance(path, dataFrames, saveState=True):
             +0.25*gameLogs['Visiting hit-by-pitch']
             +0.75*gameLogs['Visiting sacrifice hits']
             +0.75*gameLogs['Visiting sacrifice flies']
-            -3*gameLogs['Home grounded into double plays'])/64
+            -3*gameLogs['Home grounded into double plays'])
         gameLogs['Home: Batting performance'] = (0
             +0.5*gameLogs['Home at-bats']
             +2*gameLogs['Home: Score']
@@ -366,7 +368,7 @@ def asPerformance(path, dataFrames, saveState=True):
             +0.25*gameLogs['Home hit-by-pitch']
             +0.75*gameLogs['Home sacrifice hits']
             +0.75*gameLogs['Home sacrifice flies']
-            -3*gameLogs['Visiting grounded into double plays'])/64
+            -3*gameLogs['Visiting grounded into double plays'])
         gameLogs['Visiting: Pythagorean expectation'] = (
             gameLogs['Visiting: Score']**1.83)/(gameLogs['Visiting: Score']**1.83+gameLogs['Home: Score']**1.83)
         gameLogs['Home: Pythagorean expectation'] = (
@@ -416,7 +418,7 @@ def asPerformance(path, dataFrames, saveState=True):
             #-0.75*fieldings['Wild Pitches']
             #-1.5*fieldings['Opponent Stolen Bases']
             #+3.5*fieldings['Opponents Caught Stealing']
-            )/64
+            )
         return fieldings[['yearID','playerID','Fielding performance']]
     
     def asPerformancePitchings(pitchings):
@@ -433,7 +435,7 @@ def asPerformance(path, dataFrames, saveState=True):
             -2*pitchings['Runs allowed']
             -0.75*pitchings['Batters sacrifices']
             -0.75*pitchings['Batters sacrifice flies']
-            +3*pitchings['Grounded into double plays'])/64
+            +3*pitchings['Grounded into double plays'])
         pitchings['Strikeouts per walk'] = pitchings['Strikeouts']/pitchings['Walks'].replace(0,1)
         pitchings['Win rate'] = pitchings['Wins']/pitchings['Games']
         pitchings['Homeruns per game'] = pitchings['Homeruns']/pitchings['Games']
@@ -458,7 +460,7 @@ def asPerformance(path, dataFrames, saveState=True):
             +0.25*battings['Hit by pitch']
             +0.75*battings['Sacrifice hits']
             +0.75*battings['Sacrifice flies']
-            -3*battings['Grounded into double plays'])/64
+            -3*battings['Grounded into double plays'])
         return battings[['yearID','playerID','Batting performance']]
     
     print("creating performances")
@@ -599,8 +601,8 @@ def merge(path, dataFrames, saveState=True):
             return pd.merge(pd.concat(teams)[['Row']+list(dict.fromkeys(teamColumns))], pd.concat(versus)[['Row']+list(dict.fromkeys(versusColumns))], on='Row')
 
         gameLogs = gameLogs[['Row','Visiting: Team','Home: Team','Visiting: Score','Home: Score','Visiting: Win','Home: Win','League Diffrence']+toRollVisiting+toRollHome]
-        gameLogs['Home: Odd'] = (gameLogs['Home: Score'].replace(0,1))/(gameLogs['Visiting: Score'].replace(0,1))
-        gameLogs['Visiting: Odd'] = (gameLogs['Visiting: Score'].replace(0,1))/(gameLogs['Home: Score'].replace(0,1))
+        gameLogs['Home: Odd'] = gameLogs['Home: Score']/(gameLogs['Home: Score']+gameLogs['Visiting: Score']).replace(0,1)
+        gameLogs['Visiting: Odd'] = gameLogs['Visiting: Score']/(gameLogs['Visiting: Score']+gameLogs['Home: Score']).replace(0,1)
 
         toRollVisiting = ['Visiting: Score','Visiting: Win','Visiting: Odd']+toRollVisiting
         toRollHome = ['Home: Score','Home: Win','Home: Odd']+toRollHome
@@ -666,7 +668,31 @@ def merge(path, dataFrames, saveState=True):
         save(path/'Merged', dataFrames, stats=True)
     return dataFrames
 
-def createLearningData(data, path, operator="-", dropRowIndex=True):
+def createLearningData(data, path, excludes=[], operator="-", dropRowIndex=True):
+    def createDiffrence(dataFrame, operator, outcast=pd.DataFrame()):
+        homes = []
+        visitings = {}
+        temp = outcast
+        for column in dataFrame.drop(columns=temp.columns).columns:
+            if column.find("Visiting")>-1:
+                visitings[column.replace("Visiting: ","")] = column.replace("Visiting: ","")
+            elif column.find("Home")>-1:
+                homes.append(column.replace("Home: ",""))
+            else:
+                temp[column] = dataFrame[column]
+        for homeCol in homes:
+            visitingCol = visitings.pop(homeCol)
+            if operator=="-":
+                temp[homeCol+" diffrence"] = dataFrame['Home: '+homeCol]-dataFrame['Visiting: '+visitingCol]
+            elif operator=="/":
+                temp[homeCol+" diffrence"] = dataFrame['Home: '+homeCol]/dataFrame['Visiting: '+visitingCol].replace(0,1)
+            elif operator=="/sum":
+                temp[homeCol+" diffrence"] = dataFrame['Home: '+homeCol]/(dataFrame['Home: '+homeCol]+dataFrame['Visiting: '+visitingCol]).replace(0,1)
+            else:
+                temp[homeCol+" diffrence"] = dataFrame['Home: '+homeCol]>dataFrame['Visiting: '+visitingCol]
+        return temp
+    for exc in excludes:
+        data.pop(exc)
     path = path/'Learning'
     gameLogs = data.pop('gameLogs')
     predictors = gameLogs[['Row']]
@@ -675,25 +701,8 @@ def createLearningData(data, path, operator="-", dropRowIndex=True):
         predictors = pd.merge(predictors, data[frame], on='Row', how="left")
     predictors = predictors.dropna()
     targets = pd.merge(predictors[['Row']], gameLogs, on='Row', how="left")
-    homes = []
-    visitings = {}
-    temp = pd.DataFrame()
-    for column in predictors.columns:
-        if column.find("Visiting")>-1:
-            visitings[column.replace("Visiting: ","")] = column.replace("Visiting: ","")
-        elif column.find("Home")>-1:
-            homes.append(column.replace("Home: ",""))
-        else:
-            temp[column] = predictors[column]
-    for homeCol in homes:
-        visitingCol = visitings.pop(homeCol)
-        if operator=="-":
-            temp[homeCol+" diffrence"] = predictors['Home: '+homeCol]-predictors['Visiting: '+visitingCol]
-        elif operator=="/":
-            temp[homeCol+" diffrence"] = predictors['Home: '+homeCol]/predictors['Visiting: '+visitingCol]
-        else:
-            temp[homeCol+" diffrence"] = predictors['Home: '+homeCol]>predictors['Visiting: '+visitingCol]
-    predictors = temp
+    predictors = createDiffrence(predictors, operator)
+    targets = createDiffrence(targets, operator, targets[['Date','Visiting: Team','Home: Team','Visiting: Score','Home: Score','Visiting: Win','Home: Win']])
     print("Saving data to",path)
     if dropRowIndex:
         predictors.drop(columns=['Row']).to_csv(path/'Predictors.csv', index = False)
@@ -702,7 +711,6 @@ def createLearningData(data, path, operator="-", dropRowIndex=True):
         predictors.to_csv(path/'Predictors.csv', index = False)
         targets.to_csv(path/'Targets.csv', index = False)
     print("Data saved")
-
 
 def createView(columns, data):
     view = data['gameLogs'][['Row']]
@@ -715,13 +723,9 @@ def createView(columns, data):
 
 path = Path(__file__).parent.absolute()
 print(path)
-#data = filter(path)
-#data = replace(path, data)
-#data = load(path/'Replaced', True)
-#data = asPerformance(path, data)
-#data = merge(path, data)
-data = load(path/'Merged', dt=True, stats=True)
-createLearningData(data, path)
-#createView(['Visiting: Average Fielding performance','Visiting: Fielding performance ratio','Visiting: Fielding performance versus ratio',
-#    'Home: Average Batting performance','Home: Batting performance ratio','Home: Batting performance versus ratio',
-#    'Visiting: Fielding performance'], data).to_csv(path/'View.csv', index = False)
+data = filter(path)
+data = replace(path, data)
+data = asPerformance(path, data)
+data = merge(path, data)
+#data = load(path/'Merged', dt=True, stats=True)
+createLearningData(data, path, ['people'], operator="-")
