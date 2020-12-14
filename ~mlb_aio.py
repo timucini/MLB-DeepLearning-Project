@@ -700,12 +700,15 @@ def createLearningData(data, path, excludes=[], operator="-", dropRowIndex=True)
         predictors = pd.merge(predictors, data[frame], on='Row', how="left")
     predictors = predictors.dropna()
     targets = pd.merge(predictors[['Row']], gameLogs, on='Row', how="left")
-    predictors = createDiffrence(predictors, operator)
-    targets = createDiffrence(targets, operator, targets[['Date','Visiting: Team','Home: Team','Visiting: Score','Home: Score','Visiting: Win','Home: Win']])
+    if operator!=None:
+        predictors = createDiffrence(predictors, operator)
+        targets = createDiffrence(targets, operator, targets[['Date','Visiting: Team','Home: Team','Visiting: Score','Home: Score','Visiting: Win','Home: Win']])
+    else:
+        operator="None"
     print("Saving data to",path)
     if dropRowIndex:
-        predictors.drop(columns=['Row']).to_csv(path/'Predictors.csv', index = False)
-        targets.drop(columns=['Row']).to_csv(path/'Targets.csv', index = False)
+        predictors.drop(columns=['Row']).to_csv(path/(operator+"_"+'Predictors.csv'), index = False)
+        targets.drop(columns=['Row']).to_csv(path/(operator+"_"+'Targets.csv'), index = False)
     else:
         predictors.to_csv(path/'Predictors.csv', index = False)
         targets.to_csv(path/'Targets.csv', index = False)
@@ -729,4 +732,4 @@ print(path)
 #data = merge(path, data)
 #print(data)
 data = load(path/'Merged', dt=True, stats=True)
-createLearningData(data, path, ['people'], operator="-")
+createLearningData(data, path, ['people'], operator=None)
