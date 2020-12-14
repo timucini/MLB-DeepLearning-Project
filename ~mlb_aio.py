@@ -185,7 +185,7 @@ def replace(path, dataFrames, default="mean", lastKnownState=True, saveState=Tru
         frame = pd.merge(onlyFrame, fullFrame, on=['yearID',mID], how="left")
         nanFrame = frame.isna().sum().reset_index()
         nanFrame['inpurity'] = nanFrame[0]/frame.index.size
-        while (not (nanFrame[nanFrame['inpurity']>inpurity/4])['index'].tolist())==False:
+        while (not (nanFrame[nanFrame['inpurity']>inpurity/3])['index'].tolist())==False:
             frame = frame[frame[nanFrame.at[nanFrame['inpurity'].idxmax(), 'index']].notna()]
             nanFrame = frame.isna().sum().reset_index()
             nanFrame['inpurity'] = nanFrame[0]/frame.index.size
@@ -697,7 +697,6 @@ def createLearningData(data, path, excludes=[], operator="-", dropRowIndex=True)
     gameLogs = data.pop('gameLogs')
     predictors = gameLogs[['Row']]
     for frame in data:
-        data[frame] = data[frame].dropna()
         predictors = pd.merge(predictors, data[frame], on='Row', how="left")
     predictors = predictors.dropna()
     targets = pd.merge(predictors[['Row']], gameLogs, on='Row', how="left")
@@ -723,9 +722,11 @@ def createView(columns, data):
 
 path = Path(__file__).parent.absolute()
 print(path)
-data = filter(path)
-data = replace(path, data)
-data = asPerformance(path, data)
-data = merge(path, data)
-#data = load(path/'Merged', dt=True, stats=True)
+#data = filter(path)
+#data = load(path/'Filtered', dt=True)
+#data = replace(path, data, inpurity=0.7)
+#data = asPerformance(path, data)
+#data = merge(path, data)
+#print(data)
+data = load(path/'Merged', dt=True, stats=True)
 createLearningData(data, path, ['people'], operator="-")
