@@ -710,8 +710,8 @@ def createLearningData(data, path, excludes=[], operator="-", dropRowIndex=True)
         predictors.drop(columns=['Row']).to_csv(path/(operator+"_"+'Predictors.csv'), index = False)
         targets.drop(columns=['Row']).to_csv(path/(operator+"_"+'Targets.csv'), index = False)
     else:
-        predictors.to_csv(path/'Predictors.csv', index = False)
-        targets.to_csv(path/'Targets.csv', index = False)
+        predictors.to_csv(path/(operator+"_"+'Predictors.csv'), index = False)
+        targets.to_csv(path/(operator+"_"+'Targets.csv'), index = False)
     print("Data saved")
 
 def createView(columns, data):
@@ -731,4 +731,4 @@ data = replace(path, data, inpurity=0.7)
 data = asPerformance(path, data)
 data = merge(path, data)
 #data = load(path/'Merged', dt=True, stats=True)
-createLearningData(data, path, operator=None)
+createLearningData(data, path/'Learning'/'Deep Training'/'Data', operator=None)
