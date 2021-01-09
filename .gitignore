@@ -1,19 +1,8 @@
 # Python-Stuff
 venv/
-data/
-Filtered/
-Merged/
-filtered/
-merged/
-remerged/
-replaced/
-Remerged/
-Replaced/
 Input/
 input/
-Refiltered/
-refiltered/
-Performances/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -158,10 +147,35 @@ Replaced/_mlb_replaced_Fielding.csv
 Replaced/_mlb_replaced_Managers.csv
 Replaced/_mlb_replaced_Pitching.csv
 Replaced/_mlb_replaced_Teams.csv
-Performance/Batting.csv
-Performance/Fielding.csv
-Performance/GameLogs.csv
-Performance/Managers.csv
-Performance/People.csv
-Performance/Pitching.csv
+Filtered/Batting.csv
+Filtered/Fielding.csv
+Filtered/GameLogs.csv
+Filtered/Managers.csv
+Filtered/People.csv
+Filtered/Pitching.csv
+Filtered/Teams.csv
+Replaced/Batting.csv
+Replaced/Fielding.csv
+Replaced/GameLogs.csv
+Replaced/Managers.csv
+Replaced/People.csv
+Replaced/Pitching.csv
+Replaced/Teams.csv
 Performance/Teams.csv
+Performance/Pitching.csv
+Performance/People.csv
+Performance/Managers.csv
+Performance/GameLogs.csv
+Performance/Fielding.csv
+Performance/Batting.csv
+Merged/Teams.csv
+Merged/Stats.csv
+Merged/Pitching.csv
+Merged/People.csv
+Merged/Managers.csv
+Merged/GameLogs.csv
+Merged/Fielding.csv
+Merged/Batting.csv
+Learning/Deep Training/Data/Learning/None_Targets.csv
+Learning/Deep Training/Data/Learning/None_Predictors.csv
+
