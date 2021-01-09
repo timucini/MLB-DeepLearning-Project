@@ -1,0 +1,17 @@
+timestamp,predictors,identifier,optimizer,layers,activations,dropouts,dimensions,length,nodes,loss,binary_accuracy,time,epochs
+2021-01-09 10:13:41.716031,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[1]","['None']","[0]",2,1,1,0.7150065898895264,0.5001000165939331,9.399407,20
+2021-01-09 10:14:00.777484,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[2]","['None']","[0]",2,1,2,0.6924965977668762,0.5133000016212463,12.830106,28
+2021-01-09 10:14:20.869417,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[3]","['None']","[0]",2,1,3,0.6916205286979675,0.5167999863624573,13.745629,30
+2021-01-09 10:14:41.498274,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[4]","['None']","[0]",2,1,4,0.692223310470581,0.5200999975204468,14.721094,33
+2021-01-09 10:15:05.676266,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[5]","['None']","[0]",2,1,5,0.6922527551651001,0.5188000202178955,18.04385,40
+2021-01-09 10:15:29.177136,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[6]","['None']","[0]",2,1,6,0.6922084093093872,0.5144000053405762,17.299977,38
+2021-01-09 10:15:55.985340,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[7]","['None']","[0]",2,1,7,0.6924678683280945,0.5206999778747559,20.595105,45
+2021-01-09 10:16:12.836485,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[8]","['None']","[0]",2,1,8,0.739467442035675,0.5001000165939331,10.928997,23
+2021-01-09 10:16:38.601678,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[9]","['None']","[0]",2,1,9,0.6917219758033752,0.5220999717712402,19.573306,42
+2021-01-09 10:16:55.815304,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[10]","['None']","[0]",2,1,10,0.7387802004814148,0.5001000165939331,10.932686,23
+2021-01-09 10:17:15.132706,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[9, 1]","['None', 'None']","[0, 0]",2,2,10,0.6925592422485352,0.5098000168800354,13.1711,28
+2021-01-09 10:17:32.202821,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[9]","['relu']","[0]",2,1,9,0.7381533980369568,0.5001000165939331,10.831763,23
+2021-01-09 10:17:47.785906,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[9]","['selu']","[0]",2,1,9,1.66435706615448,0.5002999901771545,9.668383,21
+2021-01-09 10:18:05.581255,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[9]","['elu']","[0]",2,1,9,0.7406959533691406,0.5001000165939331,11.30448,23
+2021-01-09 10:18:21.799285,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[9]","['tanh']","[0]",2,1,9,1.3255376815795898,0.5001000165939331,9.997695,21
+2021-01-09 10:18:38.346688,"['Visiting: Team - Pythagorean expectation', 'Home: Batting performance ratio']",10134744781,adam,"[9]","['softsign']","[0]",2,1,9,0.7535049915313721,0.5001000165939331,9.94072,21

@@ -1,0 +1,17 @@
+timestamp,predictors,identifier,optimizer,layers,activations,dropouts,dimensions,length,nodes,loss,binary_accuracy,time,epochs
+2021-01-09 10:14:39.377576,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[1]","['None']","[0]",2,1,1,0.7383930683135986,0.5001000165939331,8.923691,20
+2021-01-09 10:14:55.685910,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[2]","['None']","[0]",2,1,2,0.8173645734786987,0.5022000074386597,10.272196,22
+2021-01-09 10:15:11.041941,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[3]","['None']","[0]",2,1,3,0.8509352803230286,0.5022000074386597,9.417472,21
+2021-01-09 10:15:27.262493,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[4]","['None']","[0]",2,1,4,0.8466101288795471,0.5044000148773193,10.238239,22
+2021-01-09 10:15:43.558838,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[5]","['None']","[0]",2,1,5,0.8133101463317871,0.5006999969482422,10.094442,22
+2021-01-09 10:15:59.771806,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[6]","['None']","[0]",2,1,6,0.7980589866638184,0.5023000240325928,10.24566,22
+2021-01-09 10:16:15.754683,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[7]","['None']","[0]",2,1,7,0.8481030464172363,0.503000020980835,10.137819,22
+2021-01-09 10:16:32.094359,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[8]","['None']","[0]",2,1,8,0.7889159917831421,0.5016000270843506,10.324884,22
+2021-01-09 10:16:49.115977,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[9]","['None']","[0]",2,1,9,0.7571852207183838,0.504800021648407,10.6531,22
+2021-01-09 10:17:05.628106,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[10]","['None']","[0]",2,1,10,0.7463188171386719,0.5016999840736389,10.310277,22
+2021-01-09 10:17:22.547536,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[9, 1]","['None', 'None']","[0, 0]",2,2,10,0.7567018270492554,0.5001999735832214,10.989161,22
+2021-01-09 10:17:38.994062,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[9]","['relu']","[0]",2,1,9,0.7604113221168518,0.5052000284194946,10.378608,22
+2021-01-09 10:17:55.107694,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[9]","['selu']","[0]",2,1,9,0.7620857357978821,0.5037999749183655,10.052011,22
+2021-01-09 10:18:11.807324,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[9]","['elu']","[0]",2,1,9,0.7782323360443115,0.5013999938964844,10.379282,22
+2021-01-09 10:18:27.917517,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[9]","['tanh']","[0]",2,1,9,1.3804681301116943,0.5001000165939331,9.910566,21
+2021-01-09 10:18:45.248843,"['Home: Score versus ratio', 'Visiting: Average Fielding performance']",8046189004,adam,"[9]","['softsign']","[0]",2,1,9,0.7369014024734497,0.5001000165939331,10.179501,21
