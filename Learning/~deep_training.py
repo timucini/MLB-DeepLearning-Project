@@ -63,7 +63,7 @@ def getData(path, targets, predictors, save=False, load=False, targetsCols=None,
     if save:
         saveData((ps, ts))
     return ps, ts
-def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minDuration, maxDuration, start, stop, worker=-1):
+def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minDuration, maxDuration, start, stop, worker=-1, epsilon=8, validationMetrics=[]):
     def getBatchSize(size):
         sizes = []
         for i in range((size//6)+1, 2, -1):
@@ -97,7 +97,7 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
             output = list(frame.columns)
         frame = frame[frame['identifier']==identifier].sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True])
         return frame[output].to_dict('records')[0]
-    def predictorTraining(epsilon=8):
+    def predictorTraining():
         def sample(columns, bias, maxNodes):
             def getIdentifier(sample):
                 def string2int(string):
@@ -313,6 +313,12 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
         getDropouts()
         getOptimizer()
         return training(flushLog())
+    def validationScoring():
+        def findModel():
+            models = []
+            for model in (path/'Models').glob('*.h5'):
+                append
+        best = loadLog('predictors_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True])
     predictorTraining()
 path = Path(__file__).parent.absolute()/'Deep Training'
 initGPU()
