@@ -325,5 +325,5 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
     #deeperTraining()
 path = Path(__file__).parent.absolute()/'Deep Training'
 initGPU()
-predictors, targets = getData(path/'Data', 'None_Targets', 'None_Predictors', save=False, targetsCols=['Home: Win','Visiting: Win'], centerBy='Home: Win', centerSize=50000)
+predictors, targets = getData(path/'Data', 'None_Targets', 'None_Predictors', load=True, targetsCols=['Home: Win','Visiting: Win'], centerBy='Home: Win', centerSize=75000)
 trainingRoutine('None', path, predictors, targets, 'binary_accuracy', False, 20, 100, 0.1, 0.01, worker=int(input()))
