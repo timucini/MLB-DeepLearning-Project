@@ -314,14 +314,16 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
         getOptimizer()
         return training(flushLog())
     def deeperTraining():
-        best = loadLog('predictors_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True]).to_dict('rocords')[:epsilon]
-        for good in best:
-            row2log('deeper_log.csv', parameterTraining((predictors[0][good['predictors']], predictors[1][good['predictors']]), 100, good['identifier'], round(minDuration*2.5), round(maxDuration*2.5), start, stop/10))
-        best = loadLog('deeper_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True]).to_dict('rocords')[0]
-        print(parameterTraining((predictors[0][best['predictors']], predictors[1][best['predictors']]), 150, best['identifier'], 250, 1250, 1, 0.001))
-    #predictorTraining()
-    deeperTraining()
+        #tbd
+        #best = loadLog('predictors_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True]).to_dict('rocords')[:epsilon]
+        #for good in best:
+        #    row2log('deeper_log.csv', parameterTraining((predictors[0][good['predictors']], predictors[1][good['predictors']]), 100, good['identifier'], round(minDuration*2.5), round(maxDuration*2.5), start, stop/10))
+        #best = loadLog('deeper_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True]).to_dict('rocords')[0]
+        test = ['Visiting: Odd versus ratio', 'Home: Pitcher - Win rate', 'Home: Win ratio', 'Visiting: Pitcher - Win rate']
+        print(parameterTraining((predictors[0][test], predictors[1][test]), 5, 'test', 20, 100, 0.1, 0.01))
+    predictorTraining()
+    #deeperTraining()
 path = Path(__file__).parent.absolute()/'Deep Training'
 initGPU()
-predictors, targets = getData(path/'Data', 'None_Targets', 'None_Predictors', load=True, targetsCols=['Home: Win','Visiting: Win'], centerBy='Home: Win', centerSize=100000)
+predictors, targets = getData(path/'Data', 'None_Targets', 'None_Predictors', save=False, targetsCols=['Home: Win','Visiting: Win'], centerBy='Home: Win', centerSize=50000)
 trainingRoutine('None', path, predictors, targets, 'binary_accuracy', False, 20, 100, 0.1, 0.01, worker=int(input()))
