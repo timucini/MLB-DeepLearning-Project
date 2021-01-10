@@ -63,7 +63,7 @@ def getData(path, targets, predictors, save=False, load=False, targetsCols=None,
     if save:
         saveData((ps, ts))
     return ps, ts
-def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minDuration, maxDuration, start, stop, worker=-1, epsilon=8, validationMetrics=[]):
+def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minDuration, maxDuration, start, stop, startNodes=10, worker=-1, epsilon=8, validationMetrics=[]):
     def getBatchSize(size):
         sizes = []
         for i in range((size//6)+1, 2, -1):
@@ -128,7 +128,7 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
                 backlog = check(identifier)
                 if backlog.empty:
                     samples = (predictors[0][samples], predictors[1][samples])
-                    row = parameterTraining(samples, maxNodes, identifier, maxNodes*10)
+                    row = parameterTraining(samples, maxNodes, identifier, minDuration, maxDuration, start, stop)
                     row2log('predictors_log.csv', row)
                     row = getBest(loadLog('predictors_log.csv'), identifier)
                     tries = appendTry(tries, row)
@@ -150,13 +150,13 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
                 maxNodes = max([(entry['nodes']/len(preds))*(len(preds)+1), len(preds)*5])
                 trace(preds, entry[metric], round(maxNodes))
         if worker<0:
-            trace([], 0.5, 10)
+            trace([], 0.5, startNodes)
         else:
-            work = sample([], 0.5, 10)[worker]
-            trace(work['predictors'], work[metric], 10)
+            work = sample([], 0.5, startNodes)[worker]
+            trace(work['predictors'], work[metric], startNodes)
         print('Worker', worker, 'finished!')
-    def parameterTraining(predictors, maxNodes, identifier, epochs):
-        header = 'timestamp,predictors,identifier,optimizer,layers,activations,dropouts,dimensions,length,nodes,loss,binary_accuracy,time,epochs'
+    def parameterTraining(predictors, maxNodes, identifier, minDuration, maxDuration, start, stop):
+        header = 'timestamp,predictors,identifier,optimizer,layers,activations,dropouts,dimensions,length,nodes,loss,'+metric+',time,epochs'
         if worker<0:
             bufferName = 'buffer_log.csv'
         else:
@@ -313,13 +313,14 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
         getDropouts()
         getOptimizer()
         return training(flushLog())
-    def validationScoring():
-        def findModel():
-            models = []
-            for model in (path/'Models').glob('*.h5'):
-                append
-        best = loadLog('predictors_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True])
-    predictorTraining()
+    def deeperTraining():
+        best = loadLog('predictors_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True]).to_dict('rocords')[:epsilon]
+        for good in best:
+            row2log('deeper_log.csv', parameterTraining((predictors[0][good['predictors']], predictors[1][good['predictors']]), 100, good['identifier'], round(minDuration*2.5), round(maxDuration*2.5), start, stop/10))
+        best = loadLog('deeper_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True]).to_dict('rocords')[0]
+        print(parameterTraining((predictors[0][best['predictors']], predictors[1][best['predictors']]), 150, best['identifier'], 250, 1250, 1, 0.001))
+    #predictorTraining()
+    deeperTraining()
 path = Path(__file__).parent.absolute()/'Deep Training'
 initGPU()
 predictors, targets = getData(path/'Data', 'None_Targets', 'None_Predictors', load=True, targetsCols=['Home: Win','Visiting: Win'], centerBy='Home: Win', centerSize=100000)
