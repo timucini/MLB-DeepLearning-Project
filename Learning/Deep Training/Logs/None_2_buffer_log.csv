@@ -1,18 +1,17 @@
 timestamp,predictors,identifier,optimizer,layers,activations,dropouts,dimensions,length,nodes,loss,binary_accuracy,time,epochs
-2021-01-10 21:46:02.404221,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[1]","['None']","[0]",2,1,1,0.6962087750434875,0.503333330154419,3.588078,20
-2021-01-10 21:46:08.292273,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[2]","['None']","[0]",2,1,2,0.694116473197937,0.502133309841156,4.024453,27
-2021-01-10 21:46:15.932828,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[3]","['None']","[0]",2,1,3,0.6932566165924072,0.512666642665863,5.589795,38
-2021-01-10 21:46:20.982160,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[4]","['None']","[0]",2,1,4,1.4055476188659668,0.5001333355903625,3.028598,22
-2021-01-10 21:46:28.157316,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[5]","['None']","[0]",2,1,5,0.6935349702835083,0.501466691493988,5.476698,37
-2021-01-10 21:46:36.245255,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[6]","['None']","[0]",2,1,6,0.696357011795044,0.5062666535377502,5.986136,41
-2021-01-10 21:46:47.580980,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[7]","['None']","[0]",2,1,7,0.6925404667854309,0.5182666778564453,9.227917,67
-2021-01-10 21:46:52.765428,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[8]","['None']","[0]",2,1,8,1.0458245277404785,0.5001333355903625,3.299831,22
-2021-01-10 21:47:00.315905,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[9]","['None']","[0]",2,1,9,0.6931440830230713,0.5013333559036255,5.31556,37
-2021-01-10 21:47:05.911707,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[10]","['None']","[0]",2,1,10,0.6970986127853394,0.5001333355903625,3.530029,23
-2021-01-10 21:47:15.226699,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[7, 1]","['None', 'None']","[0, 0]",2,2,8,0.69261634349823,0.5198666453361511,7.200178,48
-2021-01-10 21:47:21.511091,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[7, 2]","['None', 'None']","[0, 0]",2,2,9,0.6949502825737,0.5031999945640564,4.098516,26
-2021-01-10 21:47:27.649771,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[7, 3]","['None', 'None']","[0, 0]",2,2,10,0.6945146918296814,0.5008000135421753,3.890751,25
-2021-01-10 21:47:34.207126,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[7, 1]","['relu', 'None']","[0, 0]",2,2,8,0.6952906847000122,0.501466691493988,4.277422,26
-2021-01-10 21:47:41.565986,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[7, 1]","['selu', 'None']","[0, 0]",2,2,8,0.6945403218269348,0.5006666779518127,5.131109,27
-2021-01-10 21:47:47.650373,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[7, 1]","['elu', 'None']","[0, 0]",2,2,8,0.6937713623046875,0.5001333355903625,3.874713,21
-2021-01-10 21:47:54.072989,"['Home: Odd ratio', 'Visiting: Average age']",H02D580620715686,adam,"[7, 1]","['tanh', 'None']","[0, 0]",2,2,8,0.7220411896705627,0.5001333355903625,4.540001,24
+2021-01-11 08:16:14.161751,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[1]","['None']","[0]",3,1,1,0.698745608329773,0.5065333247184753,6.221202,20
+2021-01-11 08:16:26.354647,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[2]","['None']","[0]",3,1,2,0.6935886144638062,0.5198666453361511,7.955045,26
+2021-01-11 08:16:40.245676,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[3]","['None']","[0]",3,1,3,0.6939189434051514,0.5113333463668823,9.804306,32
+2021-01-11 08:16:50.976359,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[4]","['None']","[0]",3,1,4,0.6995802521705627,0.5001333355903625,6.527599,21
+2021-01-11 08:17:06.660756,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[5]","['None']","[0]",3,1,5,0.6924097537994385,0.5098666548728943,11.679713,39
+2021-01-11 08:17:17.282187,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[6]","['None']","[0]",3,1,6,0.7004139423370361,0.5050666928291321,6.363241,21
+2021-01-11 08:17:27.940012,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[7]","['None']","[0]",3,1,7,0.7006301283836365,0.5112000107765198,6.657394,21
+2021-01-11 08:17:38.451991,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[8]","['None']","[0]",3,1,8,0.7010135054588318,0.5112000107765198,6.307056,21
+2021-01-11 08:17:48.771260,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[9]","['None']","[0]",3,1,9,0.7016122937202454,0.510533332824707,6.35246,21
+2021-01-11 08:17:59.097726,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[10]","['None']","[0]",3,1,10,0.7020152807235718,0.510533332824707,6.225376,21
+2021-01-11 08:18:09.462018,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[11]","['None']","[0]",3,1,11,0.7032066583633423,0.510533332824707,6.400535,21
+2021-01-11 08:18:19.783859,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[12]","['None']","[0]",3,1,12,0.7033771872520447,0.506933331489563,6.325867,21
+2021-01-11 08:18:30.525014,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[13]","['None']","[0]",3,1,13,0.6950910091400146,0.5109333395957947,6.818637,23
+2021-01-11 08:18:40.656655,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[14]","['None']","[0]",3,1,14,0.7050119638442993,0.506933331489563,6.060489,21
+2021-01-11 08:18:55.088237,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[2, 1]","['None', 'None']","[0, 0]",3,2,3,0.6949108839035034,0.5228000283241272,10.136668,32
+2021-01-11 08:19:19.327953,"['Home: Odd ratio', 'Home: Team - Pythagorean expectation', 'Home: Team - Season Performance']",H03D378263637705,adam,"[2, 2]","['None', 'None']","[0, 0]",3,2,4,0.6893690824508667,0.5374666452407837,19.391398,38

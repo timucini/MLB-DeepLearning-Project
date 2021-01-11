@@ -1,24 +1,9 @@
 timestamp,predictors,identifier,optimizer,layers,activations,dropouts,dimensions,length,nodes,loss,binary_accuracy,time,epochs
-2021-01-10 21:45:46.693743,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[1]","['None']","[0]",2,1,1,0.6999260783195496,0.501466691493988,2.266961,20
-2021-01-10 21:45:51.237641,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[2]","['None']","[0]",2,1,2,0.6991108655929565,0.5005333423614502,2.914501,25
-2021-01-10 21:45:56.812425,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[3]","['None']","[0]",2,1,3,0.696231484413147,0.5019999742507935,3.891338,38
-2021-01-10 21:46:02.030901,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[4]","['None']","[0]",2,1,4,0.8075616359710693,0.5001333355903625,3.264802,23
-2021-01-10 21:46:07.382492,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[5]","['None']","[0]",2,1,5,0.6951645016670227,0.5004000067710876,3.405922,24
-2021-01-10 21:46:12.740089,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[6]","['None']","[0]",2,1,6,0.7702426910400391,0.5001333355903625,3.214757,21
-2021-01-10 21:46:18.284846,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[7]","['None']","[0]",2,1,7,0.6940205693244934,0.5001333355903625,3.549045,24
-2021-01-10 21:46:24.040784,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[8]","['None']","[0]",2,1,8,0.6955587863922119,0.5001333355903625,3.573065,24
-2021-01-10 21:46:33.175621,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['None']","[0]",2,1,9,0.6926987171173096,0.515333354473114,7.055054,50
-2021-01-10 21:46:39.167762,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[10]","['None']","[0]",2,1,10,0.6970639824867249,0.5031999945640564,4.043469,26
-2021-01-10 21:46:45.116867,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9, 1]","['None', 'None']","[0, 0]",2,2,10,0.6956574320793152,0.5016000270843506,4.040466,25
-2021-01-10 21:46:51.023934,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['relu']","[0]",2,1,9,0.6934233903884888,0.5001333355903625,3.837292,24
-2021-01-10 21:46:56.624740,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['selu']","[0]",2,1,9,0.6939046382904053,0.5009333491325378,3.705179,25
-2021-01-10 21:47:01.964321,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['elu']","[0]",2,1,9,0.7007214426994324,0.5019999742507935,3.583074,23
-2021-01-10 21:47:07.326921,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['tanh']","[0]",2,1,9,0.8061138391494751,0.5001333355903625,3.552047,22
-2021-01-10 21:47:12.607452,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['softsign']","[0]",2,1,9,0.6949192881584167,0.5001333355903625,3.163715,21
-2021-01-10 21:47:17.767879,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['softplus']","[0]",2,1,9,0.6950244307518005,0.5001333355903625,3.318848,21
-2021-01-10 21:47:23.753014,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['None']","[1]",2,1,9,0.694714367389679,0.5004000067710876,3.920363,25
-2021-01-10 21:47:29.093009,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['None']","[2]",2,1,9,0.6943169832229614,0.5001333355903625,3.630528,21
-2021-01-10 21:47:35.163946,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['None']","[3]",2,1,9,0.6949679255485535,0.5002666711807251,4.015423,24
-2021-01-10 21:47:41.891904,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['None']","[4]",2,1,9,0.6949309706687927,0.5037333369255066,4.484607,24
-2021-01-10 21:47:47.782486,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['None']","[5]",2,1,9,0.6941343545913696,0.5001333355903625,3.877405,21
-2021-01-10 21:47:53.516512,"['Home: Odd versus ratio', 'Visiting: Average age']",H02D937477914829,adam,"[9]","['None']","[6]",2,1,9,0.6936318278312683,0.5001333355903625,3.850409,21
+2021-01-11 08:17:50.565804,"['Home: Odd versus ratio', 'Home: Team - Pythagorean expectation', 'Visiting: Team - Season Performance']",H03D472727780777,adam,"[1]","['None']","[0]",3,1,1,0.7002288699150085,0.5073333382606506,6.033176,20
+2021-01-11 08:18:02.454182,"['Home: Odd versus ratio', 'Home: Team - Pythagorean expectation', 'Visiting: Team - Season Performance']",H03D472727780777,adam,"[2]","['None']","[0]",3,1,2,0.6936559677124023,0.5231999754905701,7.935824,26
+2021-01-11 08:18:15.185190,"['Home: Odd versus ratio', 'Home: Team - Pythagorean expectation', 'Visiting: Team - Season Performance']",H03D472727780777,adam,"[3]","['None']","[0]",3,1,3,0.6928619146347046,0.524399995803833,8.74659,29
+2021-01-11 08:18:29.100855,"['Home: Odd versus ratio', 'Home: Team - Pythagorean expectation', 'Visiting: Team - Season Performance']",H03D472727780777,adam,"[4]","['None']","[0]",3,1,4,0.6918174624443054,0.5237333178520203,9.848402,33
+2021-01-11 08:18:45.565233,"['Home: Odd versus ratio', 'Home: Team - Pythagorean expectation', 'Visiting: Team - Season Performance']",H03D472727780777,adam,"[5]","['None']","[0]",3,1,5,0.6912126541137695,0.5322666764259338,12.267475,43
+2021-01-11 08:19:08.330354,"['Home: Odd versus ratio', 'Home: Team - Pythagorean expectation', 'Visiting: Team - Season Performance']",H03D472727780777,adam,"[6]","['None']","[0]",3,1,6,0.6921257972717285,0.5250666737556458,15.210844,49
+2021-01-11 08:19:23.881908,"['Home: Odd versus ratio', 'Home: Team - Pythagorean expectation', 'Visiting: Team - Season Performance']",H03D472727780777,adam,"[7]","['None']","[0]",3,1,7,0.7235399484634399,0.5116000175476074,7.630229,22
+2021-01-11 08:19:30.332445,"['Home: Odd versus ratio', 'Home: Team - Pythagorean expectation', 'Visiting: Team - Season Performance']",H03D472727780777,adam,"[8]","['None']","[0]",3,1,8,0.6952391862869263,0.5120000243186951,4.483847,24
