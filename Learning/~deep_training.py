@@ -64,6 +64,82 @@ def getData(path, targets, predictors, save=False, load=False, targetsCols=None,
         saveData((ps, ts))
     return ps, ts
 def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minDuration, maxDuration, start, stop, startNodes=10, worker=-1, epsilon=8, validationMetrics=[]):
+    keys = ['predictors','identifier','optimizer','layers','activations','dropouts']
+    def training(blueprint, predictors, patience=False, epochs=maxDuration, start=start, stop=stop):
+        def getModel(blueprint, predictors, targets, metric):
+            def getOutput():
+                if bool==targets[0].dtypes[0]:
+                    activation = 'sigmoid'
+                    loss = 'binary_crossentropy'
+                else:
+                    activation = None
+                    loss = 'MSE'
+                model.add(Dense(targets[0].columns.size, activation=activation, kernel_initializer='ones', name=("T_"+str(hash(name))[-4:]+"_"+str(len(model.layers)+2))))
+                model.compile(optimizer=blueprint['optimizer'], loss=loss, metrics=[metric])
+                return model
+            name = blueprint['identifier']
+            model = Sequential(name=name)
+            model.add(Input(shape=(predictors[0].columns.size,), name=("I_"+str(hash(name))[-8:]+"_"+str(0))))
+            for index, nodes in enumerate(blueprint['layers']):
+                activation = blueprint['activations'][index]
+                if activation=='None':
+                    activation = None
+                model.add(Dense(nodes, activation, kernel_initializer='ones', name=("D_"+str(hash(name))[-4:]+"_"+str(index+1))))
+                if blueprint['dropouts'][index]>0:
+                    model.add(Dropout(blueprint['dropouts'][index]/nodes, name=("O_"+str(hash(name))[-4:]+"_"+str(index+1))))
+            model.add(BatchNormalization(name=("B_"+str(hash(name))[-4:]+"_"+str(len(model.layers)+1))))
+            return getOutput()
+        def evaluating(model, patience, epochs):
+            monitor = EarlyStopping(monitor=('val_'+metric),restore_best_weights=True, patience=patience)
+            start = dt.now()
+            history = model.fit(predictors[0], targets[0], batchSize, epochs, 0, [monitor], validation_data=(predictors[1], targets[1]))
+            time = (dt.now()-start).total_seconds()
+            metrics = model.evaluate(predictors[1], targets[1], return_dict=True, verbose=0)
+            metrics['time'] = time
+            metrics['epochs'] = len(history.history[metric])
+            return metrics
+        def metrics2row(blueprint, metrics):
+            def row2string(row):
+                s = ""
+                for value in row.values():
+                    if isinstance(value, list):
+                        v = '"'+str(value)+'",'
+                    else:
+                        v = str(value)+","
+                    s = s + v
+                return s[0:-1]
+            row = {}
+            row['timestamp'] = dt.now()
+            row.update(blueprint.copy())
+            row['dimensions'] = len(blueprint['predictors'])
+            row['length'] = len(blueprint['layers'])
+            row['nodes'] = sum(blueprint['layers'])
+            row.update(metrics)
+            return row2string(row)
+        epochRange = range(epochs, 0, -round(epochs/(start/stop)**0.7))
+        decrease = (stop/start)**(1/max((len(epochRange)-1,1)))
+        model = getModel(blueprint, predictors, targets, metric)
+        trained = []
+        times = []
+        for epoch in epochRange:
+            model.optimizer.lr = start
+            backup = model.get_weights()
+            image = model.evaluate(predictors[1], targets[1], return_dict=True, verbose=0)
+            if patience:
+                metrics = evaluating(model, patience, epoch)
+            else:
+                metrics = evaluating(model, epoch, epoch)
+            if image[metric] <= metrics[metric]:
+                trained.append(metrics['epochs'])
+                times.append(metrics['time'])
+                model.save(path/'Models'/(blueprint['identifier']+'.h5'))
+            else:
+                model.set_weights(backup)
+            start = start*decrease
+        metrics = model.evaluate(predictors[1], targets[1], return_dict=True, verbose=0)
+        metrics['time'] = sum(times)
+        metrics['epochs'] = sum(trained)
+        return metrics2row(blueprint, metrics)
     def getBatchSize(size):
         sizes = []
         for i in range((size//6)+1, 2, -1):
@@ -121,6 +197,18 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
             def check(identifier):
                 frame = loadLog('predictors_log.csv')
                 return frame[frame['identifier']==identifier]
+            def checkModel(identifier):
+                for model in (path/'Models').glob('*.h5'):
+                    if model.stem==identifier:
+                        return True
+                return False
+            def revaluate(identifier):
+                frame = loadLog('predictors_log.csv')
+                frame = frame[frame['identifier']==identifier]
+                frame = frame.sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True])
+                row2log('predictors_log.csv', training(blueprint, (predictors[0][blueprint['predictors']], predictors[1][blueprint['predictors']])))
+                print()
+                loadLog('predictors_log.csv').drop(frame.index).to_csv(path/'Logs'/(trainName+'predictors_log.csv'), index=False)
             pool = predictors[0].drop(columns=columns).columns.tolist()
             for column in pool:
                 samples = columns+[column]
@@ -134,7 +222,12 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
                     tries = appendTry(tries, row)
                 else:
                     backlog = getBest(backlog, identifier)
-                    tries = appendTry(tries, backlog)
+                    if checkModel(identifier):
+                        tries = appendTry(tries, backlog)
+                    else:
+                        revaluate(identifier)
+                        row = getBest(loadLog('predictors_log.csv'), identifier)
+                        tries = appendTry(tries, row)
             return tries
         def trace(line, bias, nodes):
             print('Worker:    ', worker)
@@ -163,86 +256,10 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
             bufferName = str(worker)+'_buffer_log.csv'
         with open(path/'Logs'/(trainName+'_'+bufferName),'w') as logCSV:
             logCSV.write(header)
-        keys = ['predictors','identifier','optimizer','layers','activations','dropouts']
         def check(blueprint):
             frame = loadLog(bufferName).astype(str)
             model = pd.Series(blueprint).astype(str).loc[['optimizer','layers','activations','dropouts']].tolist()
             return frame[frame[['optimizer','layers','activations','dropouts']].isin(model).all(axis=1)]
-        def training(blueprint, patience=False, epochs=maxDuration, start=start, stop=stop):
-            def getModel(blueprint, predictors, targets, metric):
-                def getOutput():
-                    if bool==targets[0].dtypes[0]:
-                        activation = 'sigmoid'
-                        loss = 'binary_crossentropy'
-                    else:
-                        activation = None
-                        loss = 'MSE'
-                    model.add(Dense(targets[0].columns.size, activation=activation, kernel_initializer='ones', name=("T_"+str(hash(name))[-4:]+"_"+str(len(model.layers)+2))))
-                    model.compile(optimizer=blueprint['optimizer'], loss=loss, metrics=[metric])
-                    return model
-                name = blueprint['identifier']
-                model = Sequential(name=name)
-                model.add(Input(shape=(predictors[0].columns.size,), name=("I_"+str(hash(name))[-8:]+"_"+str(0))))
-                for index, nodes in enumerate(blueprint['layers']):
-                    activation = blueprint['activations'][index]
-                    if activation=='None':
-                        activation = None
-                    model.add(Dense(nodes, activation, kernel_initializer='ones', name=("D_"+str(hash(name))[-4:]+"_"+str(index+1))))
-                    if blueprint['dropouts'][index]>0:
-                        model.add(Dropout(blueprint['dropouts'][index]/nodes, name=("O_"+str(hash(name))[-4:]+"_"+str(index+1))))
-                model.add(BatchNormalization(name=("B_"+str(hash(name))[-4:]+"_"+str(len(model.layers)+1))))
-                return getOutput()
-            def evaluating(model, patience, epochs):
-                monitor = EarlyStopping(monitor=('val_'+metric),restore_best_weights=True, patience=patience)
-                start = dt.now()
-                history = model.fit(predictors[0], targets[0], batchSize, epochs, 0, [monitor], validation_data=(predictors[1], targets[1]))
-                time = (dt.now()-start).total_seconds()
-                metrics = model.evaluate(predictors[1], targets[1], return_dict=True, verbose=0)
-                metrics['time'] = time
-                metrics['epochs'] = len(history.history[metric])
-                return metrics
-            def metrics2row(blueprint, metrics):
-                def row2string(row):
-                    s = ""
-                    for value in row.values():
-                        if isinstance(value, list):
-                            v = '"'+str(value)+'",'
-                        else:
-                            v = str(value)+","
-                        s = s + v
-                    return s[0:-1]
-                row = {}
-                row['timestamp'] = dt.now()
-                row.update(blueprint.copy())
-                row['dimensions'] = len(blueprint['predictors'])
-                row['length'] = len(blueprint['layers'])
-                row['nodes'] = sum(blueprint['layers'])
-                row.update(metrics)
-                return row2string(row)
-            epochRange = range(epochs, 0, -round(epochs/(start/stop)**0.7))
-            decrease = (stop/start)**(1/max((len(epochRange)-1,1)))
-            model = getModel(blueprint, predictors, targets, metric)
-            trained = []
-            times = []
-            for epoch in epochRange:
-                model.optimizer.lr = start
-                backup = model.get_weights()
-                image = model.evaluate(predictors[1], targets[1], return_dict=True, verbose=0)
-                if patience:
-                    metrics = evaluating(model, patience, epoch)
-                else:
-                    metrics = evaluating(model, epoch, epoch)
-                if image[metric] <= metrics[metric]:
-                    trained.append(metrics['epochs'])
-                    times.append(metrics['time'])
-                    model.save(path/'Models'/(blueprint['identifier']+'.h5'))
-                else:
-                    model.set_weights(backup)
-                start = start*decrease
-            metrics = model.evaluate(predictors[1], targets[1], return_dict=True, verbose=0)
-            metrics['time'] = sum(times)
-            metrics['epochs'] = sum(trained)
-            return metrics2row(blueprint, metrics)
         def getSize():
             def getDuration(blueprint):
                 nodes = sum(blueprint['layers'])
@@ -254,7 +271,7 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
                     blueprint['layers'][-1] = width
                     backlog = check(blueprint)
                     if backlog.empty:
-                        row2log(bufferName, training(blueprint, patience=minDuration, epochs=getDuration(blueprint), start=0.1, stop=0.1))
+                        row2log(bufferName, training(blueprint, predictors, patience=minDuration, epochs=getDuration(blueprint), start=0.1, stop=0.1))
                 blueprint = getBest(loadLog(bufferName), identifier, output=list(blueprint.keys()))
                 if blueprint['layers'][-1]==1:
                     break
@@ -272,7 +289,7 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
                     blueprint['activations'][i] = activation
                     backlog = check(blueprint)
                     if backlog.empty:
-                        row2log(bufferName, training(blueprint, patience=minDuration, epochs=maxD, start=0.1, stop=0.1))
+                        row2log(bufferName, training(blueprint, predictors, patience=minDuration, epochs=maxD, start=0.1, stop=0.1))
                     else:
                         best = getBest(backlog, identifier=identifier)
                         maxD = int(best['epochs'])
@@ -285,7 +302,7 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
                     blueprint['dropouts'][i] = drop
                     backlog = check(blueprint)
                     if backlog.empty:
-                        row2log(bufferName, training(blueprint, patience=minDuration, epochs=maxD, start=0.1, stop=0.1))
+                        row2log(bufferName, training(blueprint, predictors, patience=minDuration, epochs=maxD, start=0.1, stop=0.1))
                     else:
                         best = getBest(backlog, identifier=identifier)
                         maxD = int(best['epochs'])
@@ -298,7 +315,7 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
                 blueprint['optimizer'] = optimizer
                 backlog = check(blueprint)
                 if backlog.empty:
-                    row2log(bufferName, training(blueprint, patience=minDuration, epochs=maxD, start=0.1, stop=0.1))
+                    row2log(bufferName, training(blueprint, predictors, patience=minDuration, epochs=maxD, start=0.1, stop=0.1))
                 else:
                     best = getBest(backlog, identifier=identifier)
                     maxD = int(best['epochs'])
@@ -312,18 +329,9 @@ def trainingRoutine(trainName, path, predictors, targets, metric, minimise, minD
         getActivations()
         getDropouts()
         getOptimizer()
-        return training(flushLog())
-    def deeperTraining():
-        #tbd
-        #best = loadLog('predictors_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True]).to_dict('rocords')[:epsilon]
-        #for good in best:
-        #    row2log('deeper_log.csv', parameterTraining((predictors[0][good['predictors']], predictors[1][good['predictors']]), 100, good['identifier'], round(minDuration*2.5), round(maxDuration*2.5), start, stop/10))
-        #best = loadLog('deeper_log.csv').sort_values(by=[metric, 'loss', 'epochs', 'nodes', 'time'], ascending=[minimise, True, True, True, True]).to_dict('rocords')[0]
-        test = ['Visiting: Odd versus ratio', 'Home: Pitcher - Win rate', 'Home: Win ratio', 'Visiting: Pitcher - Win rate']
-        print(parameterTraining((predictors[0][test], predictors[1][test]), 5, 'test', 20, 100, 0.1, 0.01))
+        return training(flushLog(), predictors)
     predictorTraining()
-    #deeperTraining()
 path = Path(__file__).parent.absolute()/'Deep Training'
 initGPU()
-predictors, targets = getData(path/'Data', 'None_Targets', 'None_Predictors', load=True, targetsCols=['Home: Win','Visiting: Win'], centerBy='Home: Win', centerSize=75000)
+predictors, targets = getData(path/'Data', 'None_Targets', 'None_Predictors', save=True, targetsCols=['Home: Win','Visiting: Win'], centerBy='Home: Win', centerSize=70000)
 trainingRoutine('None', path, predictors, targets, 'binary_accuracy', False, 20, 100, 0.1, 0.01, worker=int(input()))
