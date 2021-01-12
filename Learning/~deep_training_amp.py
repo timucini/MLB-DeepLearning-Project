@@ -15,6 +15,7 @@ metric = 'binary_accuracy'
 minimise = False
 #expanded settings
 name_data = 'none_'#''
+worker = int(input('Enter Worker ID: '))
 #gpu settings
 for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.config.experimental.set_memory_growth(gpu, True)
@@ -124,38 +125,42 @@ def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_
     metrics['time'] = sum(times)
     metrics['epochs'] = sum(trained)
     return to_row(metrics)
-def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3, epsilon=8, worker=0, start_learning_rate = 0.1, stop_learning_rate = 0.01, parameter_patience = 20, node_multiplier = 10):
+def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3, epsilon=8, start_learning_rate = 0.1, stop_learning_rate = 0.01, parameter_patience = 20, node_multiplier = 10):
     #functions
-    def trace_predictor(used_predictors, bias, nodes):
+    def force_try(predictor_combination):
+        #enviroment
+        dimension_lenght = len(predictor_combination['predictors'])
+        nodes = max((dimension_lenght*minimal_node_increase)+start_nodes, (predictor_combination['nodes']/dimension_lenght)*(dimension_lenght+1))
+        #procedure
+        trace_predictor(predictor_combination['predictors'], predictor_combination[metric], round(nodes))
+    def try_predictors(used_predictors, bias, nodes):
+        #enviroment
+        tries = []
+        maximial_epochs = nodes*node_multiplier
         #functions
-        def try_predictors(try_at, bias, nodes):
+        def get_identifier(predictor_sample):
             #enviroment
-            tries = []
-            maximial_epochs = nodes*node_multiplier
+            identifier = 0
             #functions
-            def get_identifier(predictor_sample):
+            def numberficate(string):
                 #enviroment
-                identifier = 0
-                #functions
-                def numberficate(string):
-                    #enviroment
-                    value = 0
-                    #procedure
-                    for index, char in enumerate(string):
-                        value = value+(index+1)*31*ord(char)*113*len(string)*271
-                    return value
+                value = 0
                 #procedure
-                for predictor in predictor_sample:
-                    identifier = identifier+numberficate(predictor)
-                preface = str(len(predictor_sample)).zfill(2)+'D'
-                return (preface+(str(identifier).zfill(16-len(preface))))[:16]
-            def append_tries(result, tries):
+                for index, char in enumerate(string):
+                    value = value+(index+1)*31*ord(char)*113*len(string)*271
+                return value
+            #procedure
+            for predictor in predictor_sample:
+                identifier = identifier+numberficate(predictor)
+            preface = str(len(predictor_sample)).zfill(2)+'D'
+            return (preface+(str(identifier).zfill(16-len(preface))))[:16]
+        def append_tries(result, tries):
                 #procedure
                 if result[metric]>=bias:
                     tries.append(result)
                     return pd.DataFrame(tries).sort_values(by=sort_fields, ascending=sort_conditions).to_dict('records')[:epsilon]
                 return tries
-            def to_log(row):
+        def to_log(row):
                 #functions
                 def to_string():
                     s = ''
@@ -170,7 +175,7 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
                 with open(predictor_log_path,'a') as log:
                     log.write('\n')
                     log.write(to_string())
-            def check(identifier):
+        def check(identifier):
                 #functions
                 def load_log():
                     #enviroment
@@ -197,47 +202,51 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
                     #procedure
                     for model_path in models_path.glob('*.h5'):
                         if model_path.stem==identifier:
-                            if datetime.fromtimestamp(model_path.stat().st_mtime)<=data_date:
-                                return training(blueprint, maximial_epochs, stop_learning_rate, stop_learning_rate, parameter_patience)
+                            model_date = datetime.fromtimestamp(model_path.stat().st_mtime)
+                            if model_date<=data_date:
+                                row = training(blueprint, maximial_epochs, stop_learning_rate, stop_learning_rate, parameter_patience)
+                                to_log(row)
+                                return row
                             else:
                                 return best.to_dict('records')[0]
-                    return training(blueprint, maximial_epochs, stop_learning_rate, stop_learning_rate, parameter_patience)
+                    row = training(blueprint, maximial_epochs, stop_learning_rate, stop_learning_rate, parameter_patience)
+                    to_log(row)
+                    return row
                 #procedure
                 backlog = load_log()
-                backlog = backlog[backlog['identifier']=='identifier']
+                backlog = backlog[backlog['identifier']==identifier]
                 if backlog.empty:
                     return {}
                 else:
                     return get_latest(backlog)
-            #procedure
-            for predictor in validation_predictors.drop(columns=used_predictors).columns:
-                predictor_sample = used_predictors+[predictor]
-                identifier = get_identifier(predictor_sample)
-                from_log = check(identifier)
-                if not from_log:
-                    row = parameter_evaluation(predictor_sample, identifier, parameter_patience, maximial_epochs, nodes, start_learning_rate, stop_learning_rate)
-                    to_log(row)
-                    tries = append_tries(row, tries)
-                else:
-                    to_log(from_log)
-                    tries = append_tries(from_log, tries)
-            return tries
+        #procedure
+        for predictor in validation_predictors.drop(columns=used_predictors).columns:
+            predictor_sample = used_predictors+[predictor]
+            identifier = get_identifier(predictor_sample)
+            from_log = check(identifier)
+            if not from_log:
+                row = parameter_evaluation(predictor_sample, identifier, parameter_patience, maximial_epochs, nodes, start_learning_rate, stop_learning_rate)
+                to_log(row)
+                tries = append_tries(row, tries)
+            else:
+                tries = append_tries(from_log, tries)
+        return tries
+    def trace_predictor(used_predictors, bias, nodes):
         #procedure
         print('Worker:    ', worker)
         print('Predictors:', used_predictors)
         print('Bias:      ', bias)
         print('Nodes:     ', nodes,'\n')
         tries = try_predictors(used_predictors, bias, nodes)
-        print(pd.DataFrame(tries))
-        input()
         if not tries:
             print('Dead end @:', used_predictors, '\n')
             return
         for predictor_combination in tries:
-            dimension_lenght = len(predictor_combination['predictors'])
-            nodes = max((dimension_lenght*minimal_node_increase)+start_nodes, (predictor_combination['nodes']/dimension_lenght)*(dimension_lenght+1))
-            trace_predictor(predictor_combination['predictors'], predictor_combination[metric], round(nodes))
+            force_try(predictor_combination)
     #procedure
+    if (worker>=0) and (worker<epsilon):
+        predictor_combination = try_predictors([], start_bias, start_nodes)[worker]
+        force_try(predictor_combination)
     trace_predictor([], start_bias, start_nodes)
 def parameter_evaluation(predictors, identifier, parameter_patience, maximial_epochs, maximial_nodes, start_learning_rate, stop_learning_rate):
     #enviroment
