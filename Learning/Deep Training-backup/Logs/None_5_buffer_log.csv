@@ -1,0 +1,4 @@
+timestamp,predictors,identifier,optimizer,layers,activations,dropouts,dimensions,length,nodes,loss,binary_accuracy,time,epochs
+2021-01-11 09:45:45.456571,"['Home: Win ratio', 'Home: Pythagorean expectation versus ratio']",H02D379614605035,adam,"[1]","['None']","[0]",2,1,1,0.6961910724639893,0.5040000081062317,4.031562,20
+2021-01-11 09:45:53.179390,"['Home: Win ratio', 'Home: Pythagorean expectation versus ratio']",H02D379614605035,adam,"[2]","['None']","[0]",2,1,2,0.693844735622406,0.513866662979126,5.219155,29
+2021-01-11 09:46:03.674400,"['Home: Win ratio', 'Home: Pythagorean expectation versus ratio']",H02D379614605035,adam,"[3]","['None']","[0]",2,1,3,0.6934555172920227,0.5066666603088379,8.517731,38

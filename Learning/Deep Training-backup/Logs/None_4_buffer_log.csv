@@ -1,0 +1,31 @@
+timestamp,predictors,identifier,optimizer,layers,activations,dropouts,dimensions,length,nodes,loss,binary_accuracy,time,epochs
+2021-01-11 09:41:39.066127,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[1]","['None']","[0]",2,1,1,0.6960623860359192,0.5001333355903625,3.67216,20
+2021-01-11 09:41:45.944370,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[2]","['None']","[0]",2,1,2,0.6988530158996582,0.5001333355903625,5.15665,29
+2021-01-11 09:41:54.726300,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[3]","['None']","[0]",2,1,3,0.6930995583534241,0.5050666928291321,6.59426,38
+2021-01-11 09:42:05.273993,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[4]","['None']","[0]",2,1,4,0.694011926651001,0.5019999742507935,8.266266,47
+2021-01-11 09:42:18.074224,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[5]","['None']","[0]",2,1,5,0.6929768323898315,0.5040000081062317,10.331289,56
+2021-01-11 09:42:27.168679,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['None']","[0]",2,1,6,0.6924428939819336,0.5278666615486145,7.078673,37
+2021-01-11 09:42:33.794192,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[7]","['None']","[0]",2,1,7,0.8047754764556885,0.5010666847229004,4.531602,22
+2021-01-11 09:42:41.747934,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[8]","['None']","[0]",2,1,8,0.6925050020217896,0.5169333219528198,5.812952,31
+2021-01-11 09:42:51.358054,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[9]","['None']","[0]",2,1,9,0.6924984455108643,0.5185333490371704,7.578712,40
+2021-01-11 09:43:05.343513,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[10]","['None']","[0]",2,1,10,0.6926656365394592,0.5137333273887634,11.87592,66
+2021-01-11 09:43:13.734788,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6, 1]","['None', 'None']","[0, 0]",2,2,7,0.6924790143966675,0.5122666954994202,6.109848,34
+2021-01-11 09:43:25.016913,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6, 2]","['None', 'None']","[0, 0]",2,2,8,0.692527174949646,0.5102666616439819,8.969446,46
+2021-01-11 09:43:40.768134,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6, 3]","['None', 'None']","[0, 0]",2,2,9,0.6923656463623047,0.5122666954994202,13.376036,72
+2021-01-11 09:43:49.784458,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6, 4]","['None', 'None']","[0, 0]",2,2,10,0.692929744720459,0.506933331489563,6.656766,33
+2021-01-11 09:43:59.816486,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['relu']","[0]",2,1,6,0.6932569146156311,0.5040000081062317,7.547461,37
+2021-01-11 09:44:09.504736,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['selu']","[0]",2,1,6,0.6926285624504089,0.5008000135421753,7.328693,37
+2021-01-11 09:44:19.224240,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['elu']","[0]",2,1,6,0.6929817795753479,0.5026666522026062,7.531834,37
+2021-01-11 09:44:26.336714,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['tanh']","[0]",2,1,6,0.7030202746391296,0.5001333355903625,4.70349,22
+2021-01-11 09:44:33.118490,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['softsign']","[0]",2,1,6,0.696818470954895,0.5001333355903625,4.390965,21
+2021-01-11 09:44:42.509843,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['softplus']","[0]",2,1,6,0.6931583285331726,0.5041333436965942,7.203683,37
+2021-01-11 09:44:49.697900,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['None']","[1]",2,1,6,0.9497545957565308,0.5004000067710876,4.875377,22
+2021-01-11 09:44:57.167229,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['None']","[2]",2,1,6,0.8061157464981079,0.5005333423614502,5.15665,22
+2021-01-11 09:45:04.406513,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['None']","[3]",2,1,6,0.6944090127944946,0.5001333355903625,5.094145,24
+2021-01-11 09:45:11.641449,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['None']","[4]",2,1,6,0.6946130990982056,0.5001333355903625,4.875379,24
+2021-01-11 09:45:19.079526,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adam,"[6]","['None']","[5]",2,1,6,0.6957091689109802,0.5001333355903625,5.297285,24
+2021-01-11 09:45:26.455098,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,sgd,"[6]","['None']","[0]",2,1,6,0.6938576102256775,0.5001333355903625,5.35979,27
+2021-01-11 09:45:38.502906,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,rmsprop,"[6]","['None']","[0]",2,1,6,104.79171752929688,0.49986666440963745,0,0
+2021-01-11 09:45:47.100793,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adadelta,"[6]","['None']","[0]",2,1,6,2.4448883533477783,0.5008000135421753,6.563009,37
+2021-01-11 09:45:55.929602,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adagrad,"[6]","['None']","[0]",2,1,6,0.694501519203186,0.5001333355903625,6.906785,37
+2021-01-11 09:46:03.960479,"['Home: Score versus ratio', 'Home: Batting performance versus ratio']",H02D334588214789,adamax,"[6]","['None']","[0]",2,1,6,0.6949964165687561,0.5001333355903625,6.000336,22
