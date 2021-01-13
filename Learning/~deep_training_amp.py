@@ -247,7 +247,8 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
     if (worker>=0) and (worker<epsilon):
         predictor_combination = try_predictors([], start_bias, start_nodes)[worker]
         force_try(predictor_combination)
-    trace_predictor([], start_bias, start_nodes)
+    else:
+        trace_predictor([], start_bias, start_nodes)
 def parameter_evaluation(predictors, identifier, parameter_patience, maximial_epochs, maximial_nodes, start_learning_rate, stop_learning_rate):
     #enviroment
     buffer_log = []

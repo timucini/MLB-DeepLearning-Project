@@ -57,12 +57,31 @@ def load_log(log_path):
                     newCol.append(newElement)
                 log[column] = pd.Series(newCol)
     return log
+def change_identifier(log_path, get_identifier_function):
+    #enviroment
+    log = load_log(log_path)
+    #procedure
+    print('Old:')
+    print(log[['predictors','identifier']])
+    log = log.to_dict('records')
+    for entry in log:
+        entry['identifier'] = get_identifier_function(entry['predictors'])
+    log = pd.DataFrame(log)
+    print('New:')
+    print(log[['predictors','identifier']])
+    return log
 def find_duplicates():
     #enviroment
     predictor_log = load_log(predictor_log_path)
     #procedure
     duplicates = predictor_log[predictor_log.duplicated(keep=False, subset='identifier')]
-    return duplicates
+    return duplicates.sort_values(by=['identifier']+sort_fields, ascending=[True]+sort_conditions)
+def drop_duplicates():
+    #enviroment
+    duplicates = find_duplicates().drop_duplicates(subset=['identifier'], keep='last')
+    log = load_log(predictor_log_path)
+    #procedure
+    return log.drop(duplicates.index)
 def find_best(n=1):
     #enviroment
     predictor_log = load_log(predictor_log_path)
@@ -78,14 +97,25 @@ def test_best():
     model = load_model(models_path/model_file)
     predictions = pd.DataFrame(model.predict(model_predictors), columns=targets.columns)
     evaluation_frame = pd.merge(targets, predictions, how='left', left_index=True, right_index=True, suffixes=('',' prediction'))
-    #specific
-    evaluation_frame['Win'] = evaluation_frame['Home: Win']>evaluation_frame['Visiting: Win']
-    evaluation_frame['Win prediction'] = evaluation_frame['Home: Win prediction']>evaluation_frame['Visiting: Win prediction']
-    evaluation_frame = evaluation_frame[['Win', 'Win prediction']]
-    evaluation_frame['Diffrence'] = False==(evaluation_frame['Win']==evaluation_frame['Win prediction'])
-    print(evaluation_frame)
-    print(sum(evaluation_frame['Diffrence']), len(evaluation_frame))
+    return evaluation_frame
 #procedure
 print(find_duplicates())
 print(find_best())
-test_best()
+print(test_best())
+def get_identifier(predictor_sample):
+    #enviroment
+    identifier = 0
+    #functions
+    def numberficate(string):
+        #enviroment
+        value = 0
+        #procedure
+        for index, char in enumerate(string):
+            value = value+(index+1)*31*ord(char)*113*len(string)*271
+        return value
+    #procedure
+    for predictor in predictor_sample:
+        identifier = identifier+numberficate(predictor)
+    preface = str(len(predictor_sample)).zfill(2)+'D'
+    return (preface+(str(identifier).zfill(16-len(preface))))[:16]
+print(change_identifier(predictor_log_path, get_identifier))
