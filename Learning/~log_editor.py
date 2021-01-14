@@ -99,9 +99,11 @@ def test_best():
     evaluation_frame = pd.merge(targets, predictions, how='left', left_index=True, right_index=True, suffixes=('',' prediction'))
     return evaluation_frame
 #procedure
+print(load_log(predictor_log_path))
 print(find_duplicates())
 print(find_best())
-print(test_best())
+#drop_duplicates().to_csv(predictor_log_path, index=False)
+#print(test_best())
 def get_identifier(predictor_sample):
     #enviroment
     identifier = 0
@@ -118,4 +120,4 @@ def get_identifier(predictor_sample):
         identifier = identifier+numberficate(predictor)
     preface = str(len(predictor_sample)).zfill(2)+'D'
     return (preface+(str(identifier).zfill(16-len(preface))))[:16]
-print(change_identifier(predictor_log_path, get_identifier))
+#print(change_identifier(predictor_log_path, get_identifier))

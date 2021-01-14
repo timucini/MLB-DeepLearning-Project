@@ -78,7 +78,7 @@ def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_
         metrics = model.evaluate(validation_predictors[blueprint['predictors']], validation_targets, return_dict=True, verbose=0)
         metrics['time'] = time
         metrics['epochs'] = len(history.history[metric])
-        return metrics
+        return metrics, model
     def to_row(metrics):
         #enviroment
         row = {'timestamp':datetime.now()}
@@ -110,9 +110,9 @@ def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_
         backup = model.get_weights()
         image = model.evaluate(validation_predictors[blueprint['predictors']], validation_targets, return_dict=True, verbose=0)
         if patience:
-            metrics = evaluating(model, patience, epochs)
+            metrics, model = evaluating(model, patience, epochs)
         else:
-            metrics = evaluating(model, epochs, epochs)
+            metrics, model = evaluating(model, epochs, epochs)
         if image[metric]<=metrics[metric]:
             trained.append(metrics['epochs'])
             times.append(metrics['time'])
@@ -238,6 +238,7 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
         print('Bias:      ', bias)
         print('Nodes:     ', nodes,'\n')
         tries = try_predictors(used_predictors, bias, nodes)
+        print(pd.DataFrame(tries), '\n')
         if not tries:
             print('Dead end @:', used_predictors, '\n')
             return
