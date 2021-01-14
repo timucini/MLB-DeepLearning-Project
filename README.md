@@ -1,7 +1,8 @@
 # MLB-DeepLearning-Project
 Win predictions for MLB Games using deeplearning models
 
-How do use this Porjekt
+For further explanation you can use our Google Colab under: https://colab.research.google.com/drive/10_9mRpLvhepMtB2XuLZj20IKN_BFi-Yy?usp=sharing
+
 # **1. Install Packages**
 * Pandas (pip install pandas)
 * Xlrd (pip install xlrd)
