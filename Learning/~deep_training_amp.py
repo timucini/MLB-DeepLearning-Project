@@ -28,6 +28,7 @@ sort_fields = [metric, 'loss', 'epochs', 'nodes', 'time']
 sort_conditions = [minimise, True, True, True, True]
 predictor_log_path = path/'Logs'/(name_data+'predictor_evaluation_log.csv')
 parameter_log_path = path/'Logs'/(name_data+'parameter_evaluation_log.csv')
+re_predictor_log_path = path/'Logs'/(name_data+'re_predictor_evaluation_log.csv')
 #model settings
 models_path = path/'Models'
 #data enviroment
@@ -38,6 +39,40 @@ training_targets = pd.read_csv(path/'Data'/'Training'/(name_data+'training_targe
 training_predictors = pd.read_csv(path/'Data'/'Training'/(name_data+'training_predictors.csv'), index_col=predictors_index)
 batch_size = len(training_targets)//10
 #functions
+def load_log(log_path):
+    #enviroment
+    log = pd.read_csv(log_path, index_col=False)
+    #procedure
+    if log.empty:
+        return log
+    for column in log.loc[:,log.dtypes==object]:
+        if (log[column][0].find('[')>-1 and log[column][0].find(']')>-1):
+            log[column] = log[column].str.replace("'",'').str.replace(', ',',').str.replace('[','').str.replace(']','').str.split(',')
+            if column=='layers' or column=='dropouts':
+                newCol = []
+                for element in log[column].tolist():
+                    newElement = []
+                    for value in element:
+                        newElement.append(int(value))
+                    newCol.append(newElement)
+                log[column] = pd.Series(newCol)
+    return log
+def get_identifier(predictor_sample):
+    #enviroment
+    identifier = 0
+    #functions
+    def numberficate(string):
+        #enviroment
+        value = 0
+        #procedure
+        for index, char in enumerate(string):
+            value = value+(index+1)*31*ord(char)*113*len(string)*271
+        return value
+    #procedure
+    for predictor in predictor_sample:
+        identifier = identifier+numberficate(predictor)
+    preface = str(len(predictor_sample)).zfill(2)+'D'
+    return (preface+(str(identifier).zfill(16-len(preface))))[:16]
 def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_rate=0.1, patience=False):
     #enviroment
     epoch_range = range(maximial_epochs, 0, -round(maximial_epochs/(start_learning_rate/stop_learning_rate)**0.7))
@@ -125,7 +160,7 @@ def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_
     metrics['time'] = sum(times)
     metrics['epochs'] = sum(trained)
     return to_row(metrics)
-def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3, epsilon=8, start_learning_rate = 0.1, stop_learning_rate = 0.01, parameter_patience = 20, node_multiplier = 10):
+def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=20, node_multiplier=10):
     #functions
     def force_try(predictor_combination):
         #enviroment
@@ -138,22 +173,6 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
         tries = []
         maximial_epochs = nodes*node_multiplier
         #functions
-        def get_identifier(predictor_sample):
-            #enviroment
-            identifier = 0
-            #functions
-            def numberficate(string):
-                #enviroment
-                value = 0
-                #procedure
-                for index, char in enumerate(string):
-                    value = value+(index+1)*31*ord(char)*113*len(string)*271
-                return value
-            #procedure
-            for predictor in predictor_sample:
-                identifier = identifier+numberficate(predictor)
-            preface = str(len(predictor_sample)).zfill(2)+'D'
-            return (preface+(str(identifier).zfill(16-len(preface))))[:16]
         def append_tries(result, tries):
                 #procedure
                 if result[metric]>=bias:
@@ -177,24 +196,6 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
                     log.write(to_string())
         def check(identifier):
                 #functions
-                def load_log():
-                    #enviroment
-                    log = pd.read_csv(predictor_log_path, index_col=False)
-                    #procedure
-                    if log.empty:
-                        return log
-                    for column in log.loc[:,log.dtypes==object]:
-                        if (log[column][0].find('[')>-1 and log[column][0].find(']')>-1):
-                            log[column] = log[column].str.replace("'",'').str.replace(', ',',').str.replace('[','').str.replace(']','').str.split(',')
-                            if column=='layers' or column=='dropouts':
-                                newCol = []
-                                for element in log[column].tolist():
-                                    newElement = []
-                                    for value in element:
-                                        newElement.append(int(value))
-                                    newCol.append(newElement)
-                                log[column] = pd.Series(newCol)
-                    return log
                 def get_latest(backlog):
                     #enviroment
                     best = backlog.sort_values(by=sort_fields, ascending=sort_conditions)
@@ -213,7 +214,7 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
                     to_log(row)
                     return row
                 #procedure
-                backlog = load_log()
+                backlog = load_log(predictor_log_path)
                 backlog = backlog[backlog['identifier']==identifier]
                 if backlog.empty:
                     return {}
@@ -250,7 +251,7 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
         force_try(predictor_combination)
     else:
         trace_predictor([], start_bias, start_nodes)
-def parameter_evaluation(predictors, identifier, parameter_patience, maximial_epochs, maximial_nodes, start_learning_rate, stop_learning_rate):
+def parameter_evaluation(predictors, identifier, parameter_patience, maximial_epochs, maximial_nodes, start_learning_rate, stop_learning_rate, output='flush'):
     #enviroment
     buffer_log = []
     initial_blueprint_values = [predictors, identifier, 'adam', [0], ['None'], [0]]
@@ -340,17 +341,38 @@ def parameter_evaluation(predictors, identifier, parameter_patience, maximial_ep
         buffer_frame = pd.DataFrame(buffer_log)
         #procedure
         buffer_frame.to_csv(parameter_log_path, header=False, index=False, mode='a')
-        #string = buffer_frame.to_csv(header=False, index=False, line_terminator='')[:-1]
-        #print(string)
-        #input()
-        #with open(parameter_log_path,'a') as log:
-        #    log.write(string)
     #procedure
     get_size()
     get_activations()
     get_dropouts()
     get_optimizer()
-    flush_log()
-    return training(get_best(), maximial_epochs, start_learning_rate, stop_learning_rate)
+    if output=='flush':
+        flush_log()
+        return training(get_best(), maximial_epochs, start_learning_rate, stop_learning_rate)
+    elif output=='records':
+        buffer_log.append(training(get_best(), maximial_epochs, start_learning_rate, stop_learning_rate))
+        return buffer_log
+def re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=50, node_multiplier=5):
+    #enviroment
+    predictor_log = load_log(predictor_log_path)
+    parameter_log = load_log(parameter_log_path)
+    #functions
+    def check(identifier):
+        re_log = load_log(re_predictor_log_path)['identifier'].tolist()
+        return identifier in re_log
+    #procedure
+    best_predictors = pd.concat((predictor_log, parameter_log)).sort_values(by=sort_fields, ascending=sort_conditions).drop_duplicates(subset=['identifier'], keep='first')[:epsilon]['predictors'].tolist()
+    all_bests = []
+    for best_set in best_predictors:
+        all_bests = all_bests + best_set
+    all_bests = list(set(all_bests))
+    best_set.append(all_bests)
+    for predictors in best_predictors:
+        identifier = get_identifier(predictors)
+        if check(identifier):
+            continue
+        nodes = len(predictors)*dimension_node_multiplier
+        pd.DataFrame(parameter_evaluation(predictors, identifier, parameter_patience, nodes*node_multiplier, nodes, start_learning_rate, stop_learning_rate, output='records')).to_csv(re_predictor_log_path, header=False, index=False, mode='a')
 #procedure
-predictor_evaluation()
+#predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=20, node_multiplier=10)
+re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=50, node_multiplier=5)

@@ -82,26 +82,33 @@ def drop_duplicates():
     log = load_log(predictor_log_path)
     #procedure
     return log.drop(duplicates.index)
-def find_best(n=1):
+def find_best(log_path,n=1):
     #enviroment
-    predictor_log = load_log(parameter_log_path)
+    log = load_log(log_path)
     #procedure
-    best = predictor_log.sort_values(by=sort_fields, ascending=sort_conditions)
+    best = log.sort_values(by=sort_fields, ascending=sort_conditions)
     return best[:n]
-def test_best():
+def test_best(log_path):
     #enviroment
-    best = find_best().to_dict('records')[0]
+    best = find_best(log_path).to_dict('records')[0]
     #procedeure
     model_predictors = predictors[best['predictors']]
     model_file = best['identifier']+'.h5'
     model = load_model(models_path/model_file)
     predictions = pd.DataFrame(model.predict(model_predictors), columns=targets.columns)
     evaluation_frame = pd.merge(targets, predictions, how='left', left_index=True, right_index=True, suffixes=('',' prediction'))
-    return evaluation_frame
+    evaluation_frame['Visiting: Win result'] = evaluation_frame['Visiting: Win prediction']>evaluation_frame['Home: Win prediction']
+    evaluation_frame['Home: Win result'] = evaluation_frame['Home: Win prediction']>evaluation_frame['Visiting: Win prediction']
+    evaluation_frame['Visiting: Win diffrence'] = evaluation_frame['Visiting: Win result']!=evaluation_frame['Visiting: Win']
+    evaluation_frame['Home: Win diffrence'] = evaluation_frame['Home: Win result']!=evaluation_frame['Home: Win']
+    return len(evaluation_frame), evaluation_frame['Visiting: Win diffrence'].sum(), evaluation_frame['Home: Win diffrence'].sum()
 #procedure
-print(load_log(predictor_log_path))
-print(find_duplicates())
-print(find_best())
+#print(load_log(predictor_log_path))
+#print(find_duplicates())
+#print(find_best(predictor_log_path,8))
+#print(find_best(parameter_log_path,8))
+print('predictor',test_best(predictor_log_path))
+print('parameter',test_best(parameter_log_path))
 #drop_duplicates().to_csv(predictor_log_path, index=False)
 #print(test_best())
 def get_identifier(predictor_sample):
