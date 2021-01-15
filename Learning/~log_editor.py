@@ -84,7 +84,7 @@ def drop_duplicates():
     return log.drop(duplicates.index)
 def find_best(n=1):
     #enviroment
-    predictor_log = load_log(predictor_log_path)
+    predictor_log = load_log(parameter_log_path)
     #procedure
     best = predictor_log.sort_values(by=sort_fields, ascending=sort_conditions)
     return best[:n]
