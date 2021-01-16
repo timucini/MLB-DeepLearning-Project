@@ -377,28 +377,29 @@ def re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learn
         re_log = load_log(re_predictor_log_path)['identifier'].tolist()
         return identifier in re_log
     #procedure
-    best_predictors = pd.concat((predictor_log, parameter_log)).sort_values(by=sort_fields, ascending=sort_conditions).drop_duplicates(subset=['identifier'], keep='first')[:epsilon]['predictors'].tolist()
+    best_predictors = pd.concat((predictor_log, parameter_log)).sort_values(by=sort_fields, ascending=sort_conditions).drop_duplicates(subset=['identifier'], keep='first')[:epsilon]
+    print(best_predictors)
+    best_predictors = best_predictors['predictors'].tolist()
     all_bests = []
     for best_set in best_predictors:
         all_bests = all_bests + best_set
     all_bests = list(set(all_bests))
     best_predictors.append(all_bests)
-    print(all_bests)
     for predictors in best_predictors:
         print(predictors)
         identifier = get_identifier(predictors)
         if check(identifier):
             continue
         nodes = len(predictors)*dimension_node_multiplier
-        pd.DataFrame(parameter_evaluation(predictors, identifier, parameter_patience, nodes*node_multiplier, nodes, start_learning_rate, stop_learning_rate, output='records')).to_csv(re_predictor_log_path, header=False, index=False, mode='a')
+        pd.DataFrame(parameter_evaluation(predictors, identifier, parameter_patience, nodes*node_multiplier, nodes, start_learning_rate, stop_learning_rate, output='records', update=True)).to_csv(re_predictor_log_path, header=False, index=False, mode='a')
 def re_parameter_evaluation(parameter_patience=100, max_epochs=500, maximal_nodes=150, start_learning_rate=0.1, stop_learning_rate=0.01):
     #enviroment
     re_predictor_log = load_log(re_predictor_log_path)
     #procedure
     best = re_predictor_log.sort_values(by=sort_fields, ascending=sort_conditions).drop_duplicates(subset=['identifier'], keep='first').iat[0,1]
-    pd.DataFrame(parameter_evaluation(best, get_identifier(best), parameter_patience, max_epochs, maximal_nodes, start_learning_rate, stop_learning_rate, output='records', update=True)).to_csv(re_parameter_log_path, header=False, index=False, mode='w')
+    pd.DataFrame(parameter_evaluation(best, get_identifier(best), parameter_patience, max_epochs, maximal_nodes, start_learning_rate, stop_learning_rate, output='records', update=True)).to_csv(re_parameter_log_path, index=False, mode='w')
 #procedure
 #predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=20, node_multiplier=10)
-#re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=50, node_multiplier=5)
-#re_parameter_evaluation(parameter_patience=100, max_epochs=500, maximal_nodes=150, start_learning_rate=0.1, stop_learning_rate=0.01)
-print(pd.DataFrame([training(test_blueprint, 20, start_learning_rate=0.1, stop_learning_rate=0.1, patience=5, save=False)]))
+re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=50, node_multiplier=5)
+re_parameter_evaluation(parameter_patience=100, max_epochs=500, maximal_nodes=150, start_learning_rate=0.1, stop_learning_rate=0.01)
+#print(pd.DataFrame([training(test_blueprint, 20, start_learning_rate=0.1, stop_learning_rate=0.1, patience=5, save=False)]))
