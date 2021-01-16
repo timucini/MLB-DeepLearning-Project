@@ -15,7 +15,7 @@ metric = 'binary_accuracy'
 minimise = False
 #expanded settings
 name_data = 'none_'#''
-worker = int(input('Enter Worker ID: '))
+worker = -1#int(input('Enter Worker ID: '))
 #gpu settings
 for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.config.experimental.set_memory_growth(gpu, True)
@@ -29,6 +29,7 @@ sort_conditions = [minimise, True, True, True, True]
 predictor_log_path = path/'Logs'/(name_data+'predictor_evaluation_log.csv')
 parameter_log_path = path/'Logs'/(name_data+'parameter_evaluation_log.csv')
 re_predictor_log_path = path/'Logs'/(name_data+'re_predictor_evaluation_log.csv')
+re_parameter_log_path = path/'Logs'/(name_data+'re_parameter_evaluation_log.csv')
 #model settings
 models_path = path/'Models'
 #data enviroment
@@ -138,6 +139,18 @@ def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_
         row['nodes'] = sum(blueprint['layers'])
         row.update(metrics)
         return deep_copy(row)
+    def only_best(model, model_metric):
+        on_system = None
+        for model_file in models_path.glob('*.h5'):
+            if model_file.stem==blueprint['identifier']:
+                on_system = load_model(model_file)
+                break
+        if on_system==None:
+            model.save(path/'Models'/(blueprint['identifier']+'.h5'))
+        else:
+            on_system = on_system.evaluate(validation_predictors[blueprint['predictors']], validation_targets, return_dict=True, verbose=0)[metric]
+            if model_metric>on_system:
+                model.save(path/'Models'/(blueprint['identifier']+'.h5'))
     #procedure
     model = get_model()
     for epochs in epoch_range:
@@ -151,12 +164,11 @@ def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_
         if image[metric]<=metrics[metric]:
             trained.append(metrics['epochs'])
             times.append(metrics['time'])
-            model.save(path/'Models'/(blueprint['identifier']+'.h5'))
         else:
             model.set_weights(backup)
         learning_rate = learning_rate*learning_rate_decrease
-    model.save(path/'Models'/(blueprint['identifier']+'.h5'))
     metrics = model.evaluate(validation_predictors[blueprint['predictors']], validation_targets, return_dict=True, verbose=0)
+    only_best(model, metrics[metric])
     metrics['time'] = sum(times)
     metrics['epochs'] = sum(trained)
     return to_row(metrics)
@@ -251,7 +263,7 @@ def predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3
         force_try(predictor_combination)
     else:
         trace_predictor([], start_bias, start_nodes)
-def parameter_evaluation(predictors, identifier, parameter_patience, maximial_epochs, maximial_nodes, start_learning_rate, stop_learning_rate, output='flush'):
+def parameter_evaluation(predictors, identifier, parameter_patience, maximial_epochs, maximial_nodes, start_learning_rate, stop_learning_rate, output='flush', update=False):
     #enviroment
     buffer_log = []
     initial_blueprint_values = [predictors, identifier, 'adam', [0], ['None'], [0]]
@@ -263,6 +275,8 @@ def parameter_evaluation(predictors, identifier, parameter_patience, maximial_ep
         #procedure
         if buffer_frame.empty:
             return False
+        if update:
+            print(buffer_frame[-16:])
         return buffer_frame[model_keys].isin(model_values).all(axis=1).any()
     def get_best(keys=blueprint_keys):
         #enviroment
@@ -366,13 +380,22 @@ def re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learn
     for best_set in best_predictors:
         all_bests = all_bests + best_set
     all_bests = list(set(all_bests))
-    best_set.append(all_bests)
+    best_predictors.append(all_bests)
+    print(all_bests)
     for predictors in best_predictors:
+        print(predictors)
         identifier = get_identifier(predictors)
         if check(identifier):
             continue
         nodes = len(predictors)*dimension_node_multiplier
         pd.DataFrame(parameter_evaluation(predictors, identifier, parameter_patience, nodes*node_multiplier, nodes, start_learning_rate, stop_learning_rate, output='records')).to_csv(re_predictor_log_path, header=False, index=False, mode='a')
+def re_parameter_evaluation(parameter_patience=100, max_epochs=500, maximal_nodes=150, start_learning_rate=0.1, stop_learning_rate=0.01):
+    #enviroment
+    re_predictor_log = load_log(re_predictor_log_path)
+    #procedure
+    best = re_predictor_log.sort_values(by=sort_fields, ascending=sort_conditions).drop_duplicates(subset=['identifier'], keep='first').iat[0,1]
+    pd.DataFrame(parameter_evaluation(best, get_identifier(best), parameter_patience, max_epochs, maximal_nodes, start_learning_rate, stop_learning_rate, output='records', update=True)).to_csv(re_parameter_log_path, header=False, index=False, mode='w')
 #procedure
 #predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=20, node_multiplier=10)
 re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=50, node_multiplier=5)
+re_parameter_evaluation(parameter_patience=100, max_epochs=500, maximal_nodes=150, start_learning_rate=0.1, stop_learning_rate=0.01)
