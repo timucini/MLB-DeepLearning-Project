@@ -22,6 +22,7 @@ for gpu in tf.config.experimental.list_physical_devices('GPU'):
 #parameter settings
 model_keys = ['optimizer','layers','activations','dropouts']
 blueprint_keys = ['predictors','identifier']+model_keys
+test_blueprint = dict(zip(blueprint_keys, [['Home: Win ratio'],'04D1234567890','adam',[4,4],['tanh','None'],[0,0]]))
 #log settings
 log_keys = ['timestamp']+blueprint_keys+['dimensions','length','nodes','loss',metric,'time','epochs']
 sort_fields = [metric, 'loss', 'epochs', 'nodes', 'time']
@@ -74,7 +75,7 @@ def get_identifier(predictor_sample):
         identifier = identifier+numberficate(predictor)
     preface = str(len(predictor_sample)).zfill(2)+'D'
     return (preface+(str(identifier).zfill(16-len(preface))))[:16]
-def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_rate=0.1, patience=False):
+def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_rate=0.1, patience=False, save=True):
     #enviroment
     epoch_range = range(maximial_epochs, 0, -round(maximial_epochs/(start_learning_rate/stop_learning_rate)**0.7))
     learning_rate_decrease = (start_learning_rate/stop_learning_rate)**(1/max((len(epoch_range)-1,1)))
@@ -168,7 +169,8 @@ def training(blueprint, maximial_epochs, start_learning_rate=0.1, stop_learning_
             model.set_weights(backup)
         learning_rate = learning_rate*learning_rate_decrease
     metrics = model.evaluate(validation_predictors[blueprint['predictors']], validation_targets, return_dict=True, verbose=0)
-    only_best(model, metrics[metric])
+    if save:
+        only_best(model, metrics[metric])
     metrics['time'] = sum(times)
     metrics['epochs'] = sum(trained)
     return to_row(metrics)
@@ -397,5 +399,6 @@ def re_parameter_evaluation(parameter_patience=100, max_epochs=500, maximal_node
     pd.DataFrame(parameter_evaluation(best, get_identifier(best), parameter_patience, max_epochs, maximal_nodes, start_learning_rate, stop_learning_rate, output='records', update=True)).to_csv(re_parameter_log_path, header=False, index=False, mode='w')
 #procedure
 #predictor_evaluation(start_bias=0.5, start_nodes=10, minimal_node_increase=3, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=20, node_multiplier=10)
-re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=50, node_multiplier=5)
-re_parameter_evaluation(parameter_patience=100, max_epochs=500, maximal_nodes=150, start_learning_rate=0.1, stop_learning_rate=0.01)
+#re_predictor_evaluation(dimension_node_multiplier=10, epsilon=8, start_learning_rate=0.1, stop_learning_rate=0.01, parameter_patience=50, node_multiplier=5)
+#re_parameter_evaluation(parameter_patience=100, max_epochs=500, maximal_nodes=150, start_learning_rate=0.1, stop_learning_rate=0.01)
+print(pd.DataFrame([training(test_blueprint, 20, start_learning_rate=0.1, stop_learning_rate=0.1, patience=5, save=False)]))
