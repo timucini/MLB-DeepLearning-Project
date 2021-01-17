@@ -26,9 +26,14 @@ def selectedAL():
     predictAL(homeTeam, visitingTeam)
 
 def predictNL(homeId, visitingId):
-    blueprintColumns = ['Visiting: Team - Season Performance', 'Home: Pitcher - Strikeouts per walk']
+    blueprintColumns = ['Visiting: Pythagorean expectation ratio', 'Home: Pythagorean expectation versus ratio',
+                        'League Diffrence', 'Visiting: Odd ratio', 'Home: Team - Win rate',
+                        'Home: Pitcher - Homeruns per game', 'Visiting: Team - Pythagorean expectation',
+                        'Home: Pitcher - Saves per game', 'Home: Pitcher - Shutouts per game',
+                        'Visiting: Pitcher - Saves per game', 'Home: Pythagorean expectation ratio',
+                        'Home: Win ratio', 'Visiting: Team - Win rate']
     targets_columns = ['Home: Win', 'Visiting: Win']
-    pathModel = '../Learning/Deep Training/Models/02D3945947641755.h5'
+    pathModel = '../Learning/Deep Training/Models/13D1956836164396.h5'
     data_folder = Path('./FrontendData')
     target_data = data_folder / "None_Targets_Frontend.csv"
     predictor_data = data_folder / "None_Predictors_Frontend.csv"
@@ -53,9 +58,14 @@ def predictNL(homeId, visitingId):
     LabelVisiting = Label(root, text=labelVisiting).grid(row=6, column=1, padx='0', pady='0', sticky='ew')
 
 def predictAL(homeId, visitingId):
-    blueprintColumns = ['Visiting: Team - Season Performance', 'Home: Pitcher - Strikeouts per walk']
+    blueprintColumns = ['Visiting: Pythagorean expectation ratio', 'Home: Pythagorean expectation versus ratio',
+                        'League Diffrence', 'Visiting: Odd ratio', 'Home: Team - Win rate',
+                        'Home: Pitcher - Homeruns per game', 'Visiting: Team - Pythagorean expectation',
+                        'Home: Pitcher - Saves per game', 'Home: Pitcher - Shutouts per game',
+                        'Visiting: Pitcher - Saves per game', 'Home: Pythagorean expectation ratio',
+                        'Home: Win ratio', 'Visiting: Team - Win rate']
     targets_columns = ['Home: Win', 'Visiting: Win']
-    pathModel = '../Learning/Deep Training/Models/02D3945947641755.h5'
+    pathModel = '../Learning/Deep Training/Models/13D1956836164396.h5'
     data_folder = Path('./FrontendData')
     target_data = data_folder / "None_Targets_Frontend.csv"
     predictor_data = data_folder / "None_Predictors_Frontend.csv"
