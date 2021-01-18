@@ -110,10 +110,7 @@ def evaluate_best(log_path):
     #procedeure
     model_file = best['identifier']+'.h5'
     model = load_model(models_path/model_file)
-    #monitor = EarlyStopping(monitor=('val_'+metric),restore_best_weights=True, patience=100)
-    #model.optimizer.lr = 0.1
-    #model.fit(training_predictors[best['predictors']], training_targets, 5000, 100, 0, [monitor], validation_data=(validation_predictors[best['predictors']], validation_targets))
-    return model.evaluate(training_predictors[best['predictors']], training_targets, return_dict=True, verbose=0), model.evaluate(validation_predictors[best['predictors']], validation_targets, return_dict=True, verbose=0)
+    return model.evaluate(validation_predictors[best['predictors']], validation_targets, return_dict=True, verbose=0)
 #procedure
 #print(load_log(predictor_log_path))
 #print(find_duplicates())
