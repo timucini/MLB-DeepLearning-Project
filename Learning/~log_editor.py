@@ -2,6 +2,7 @@ import pandas as pd
 import tensorflow as tf
 from pathlib import Path
 from datetime import datetime
+from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import load_model
 #enviroment settings
 path = Path(__file__).parent.absolute()/'Deep Training'
@@ -17,6 +18,7 @@ sort_fields = [metric, 'loss', 'epochs', 'nodes', 'time']
 sort_conditions = [minimise, True, True, True, True]
 predictor_log_path = path/'Logs'/(name_data+'predictor_evaluation_log.csv')
 parameter_log_path = path/'Logs'/(name_data+'parameter_evaluation_log.csv')
+re_parameter_log_path = path/'Logs'/(name_data+'re_parameter_evaluation_log.csv')
 #model settings
 models_path = path/'Models'
 #data settings
@@ -101,14 +103,24 @@ def test_best(log_path):
     evaluation_frame['Home: Win result'] = evaluation_frame['Home: Win prediction']>evaluation_frame['Visiting: Win prediction']
     evaluation_frame['Visiting: Win diffrence'] = evaluation_frame['Visiting: Win result']!=evaluation_frame['Visiting: Win']
     evaluation_frame['Home: Win diffrence'] = evaluation_frame['Home: Win result']!=evaluation_frame['Home: Win']
-    return len(evaluation_frame), evaluation_frame['Visiting: Win diffrence'].sum(), evaluation_frame['Home: Win diffrence'].sum()
+    return len(evaluation_frame), evaluation_frame['Visiting: Win diffrence'].sum(), evaluation_frame['Home: Win diffrence'].sum(), 1-(evaluation_frame['Visiting: Win diffrence'].sum()/len(evaluation_frame)), 1-(evaluation_frame['Home: Win diffrence'].sum()/len(evaluation_frame))
+def evaluate_best(log_path):
+    #enviroment
+    best = find_best(log_path).to_dict('records')[0]
+    #procedeure
+    model_file = best['identifier']+'.h5'
+    model = load_model(models_path/model_file)
+    #monitor = EarlyStopping(monitor=('val_'+metric),restore_best_weights=True, patience=100)
+    #model.optimizer.lr = 0.1
+    #model.fit(training_predictors[best['predictors']], training_targets, 5000, 100, 0, [monitor], validation_data=(validation_predictors[best['predictors']], validation_targets))
+    return model.evaluate(training_predictors[best['predictors']], training_targets, return_dict=True, verbose=0), model.evaluate(validation_predictors[best['predictors']], validation_targets, return_dict=True, verbose=0)
 #procedure
 #print(load_log(predictor_log_path))
 #print(find_duplicates())
 #print(find_best(predictor_log_path,8))
 #print(find_best(parameter_log_path,8))
-print('predictor',test_best(predictor_log_path))
-print('parameter',test_best(parameter_log_path))
+#print('predictor',test_best(predictor_log_path))
+#print('parameter',test_best(parameter_log_path))
 #drop_duplicates().to_csv(predictor_log_path, index=False)
 #print(test_best())
 def get_identifier(predictor_sample):
@@ -128,3 +140,5 @@ def get_identifier(predictor_sample):
     preface = str(len(predictor_sample)).zfill(2)+'D'
     return (preface+(str(identifier).zfill(16-len(preface))))[:16]
 #print(change_identifier(predictor_log_path, get_identifier))
+#print(test_best(re_parameter_log_path))
+print(evaluate_best(re_parameter_log_path))
