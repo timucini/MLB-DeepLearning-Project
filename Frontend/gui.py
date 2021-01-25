@@ -18,12 +18,12 @@ def selectedNL():
     print(visitingTeam)
     predictNL(homeTeam, visitingTeam)
 
-def selectedAL():
-    homeTeam = clickedHomeAL.get()
-    visitingTeam = clickedVisitingAL.get()
-    print(homeTeam)
-    print(visitingTeam)
-    predictAL(homeTeam, visitingTeam)
+#def selectedAL():
+    #homeTeam = clickedHomeAL.get()
+    #visitingTeam = clickedVisitingAL.get()
+    #print(homeTeam)
+    #print(visitingTeam)
+    #predictAL(homeTeam, visitingTeam)
 
 def predictNL(homeId, visitingId):
     blueprintColumns = ['Visiting: Pythagorean expectation ratio', 'Home: Pythagorean expectation versus ratio',
@@ -34,7 +34,9 @@ def predictNL(homeId, visitingId):
                         'Home: Win ratio', 'Visiting: Team - Win rate']
     targets_columns = ['Home: Win', 'Visiting: Win']
     pathModel = '../Learning/Deep Training/Models/13D1956836164396.h5'
-    data_folder = Path('./FrontendData')
+    path = Path(__file__).parent.absolute()
+    print(path)
+    data_folder = path / 'FrontendData'
     target_data = data_folder / "None_Targets_Frontend.csv"
     predictor_data = data_folder / "None_Predictors_Frontend.csv"
     df_targets = pd.read_csv(target_data)
@@ -56,7 +58,7 @@ def predictNL(homeId, visitingId):
     LabelHome = Label(root, text=labelHome).grid(row=5, column=1, padx='0', pady='0', sticky='ew')
     labelVisiting = "Value Visiting: " + str(predictions['Visiting: Win'].values)
     LabelVisiting = Label(root, text=labelVisiting).grid(row=6, column=1, padx='0', pady='0', sticky='ew')
-
+"""
 def predictAL(homeId, visitingId):
     blueprintColumns = ['Visiting: Pythagorean expectation ratio', 'Home: Pythagorean expectation versus ratio',
                         'League Diffrence', 'Visiting: Odd ratio', 'Home: Team - Win rate',
@@ -88,16 +90,17 @@ def predictAL(homeId, visitingId):
     LabelHome = Label(root, text=labelHome).grid(row=5, column=2, padx='0', pady='0', sticky='ew')
     labelVisiting = "Value Visiting: " + str(predictions['Visiting: Win'].values)
     LabelVisiting = Label(root, text=labelVisiting).grid(row=6, column=2, padx='0', pady='0', sticky='ew')
+"""
 
-
-options = ['ARI', 'ATL', 'LAN', 'MIA', 'NYN', 'SDN', 'CIN', 'MIL',
-           'PIT', 'SFN', 'PHI', 'SLN', 'WAS', 'COL', 'CHN']
-
+options = ['ANA', 'ARI', 'ATL', 'BAL', 'BOS', 'CHA', 'CHN', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KCA', 'LAN','MIA',
+           'MIL', 'MIN', 'NYA', 'NYN', 'OAK', 'PHI', 'PIT', 'SDN', 'SEA', 'SFN', 'SLN', 'TBA', 'TEX', 'TOR', 'WAS']
+"""
 optionsAL = ['BAL', 'KCA', 'OAK', 'SEA', 'TEX', 'TOR', 'DET', 'TBA',
              'ANA', 'HOU',  'NYA', 'CHA', 'MIN', 'CLE', 'BOS']
+"""
 
 print(len(options))
-print(len(optionsAL))
+#print(len(optionsAL))
 
 
 clickedHome = StringVar()
@@ -106,11 +109,11 @@ clickedHome.set(options[0])
 clickedVisiting = StringVar()
 clickedVisiting.set(options[0])
 
-clickedHomeAL = StringVar()
-clickedHomeAL.set(optionsAL[0])
+#clickedHomeAL = StringVar()
+#clickedHomeAL.set(optionsAL[0])
 
-clickedVisitingAL = StringVar()
-clickedVisitingAL.set(optionsAL[0])
+#clickedVisitingAL = StringVar()
+#clickedVisitingAL.set(optionsAL[0])
 
 League = Label(root, text="League: ").grid(row=0, column=0, padx='10', pady='10', sticky='ew')
 HomeTeam = Label(root, text="HomeTeam ID: ").grid(row=1, column=0, padx='10', pady='10', sticky='ew')
@@ -118,7 +121,7 @@ VisitingTeam = Label(root, text="Visiting ID: ").grid(row=2, column=0, padx='10'
 Prediction = Label(root, text="Prediction: ").grid(row=3, column=0, padx='10', pady='10', sticky='ew')
 
 
-LeagueTitle1 = Label(root, text="National League").grid(row=0, column=1, padx='10', pady='10', sticky='ew')
+LeagueTitle1 = Label(root, text="MLB").grid(row=0, column=1, padx='10', pady='10', sticky='ew')
 dropHome = OptionMenu(root, clickedHome, *options)
 dropHome.grid(row=1, column=1, padx='10', pady='10', sticky='ew')
 
@@ -128,17 +131,17 @@ dropVisiting.grid(row=2, column=1, padx='10', pady='10', sticky='ew')
 predictButton = Button(root, text="Predict Winner", command=selectedNL)
 predictButton.grid(row=3, column=1, padx='10', pady='10', sticky='ew')
 
-LeagueTitle2 = Label(root, text="American League").grid(row=0, column=2, padx='10', pady='10', sticky='ew')
-dropHomeAL = OptionMenu(root, clickedHomeAL, *optionsAL)
-dropHomeAL.grid(row=1, column=2, padx='10', pady='10', sticky='ew')
+#LeagueTitle2 = Label(root, text="American League").grid(row=0, column=2, padx='10', pady='10', sticky='ew')
+#dropHomeAL = OptionMenu(root, clickedHomeAL, *optionsAL)
+#dropHomeAL.grid(row=1, column=2, padx='10', pady='10', sticky='ew')
 
-dropVisitingAL = OptionMenu(root, clickedVisitingAL, *optionsAL)
-dropVisitingAL.grid(row=2, column=2, padx='10', pady='10', sticky='ew')
+#dropVisitingAL = OptionMenu(root, clickedVisitingAL, *optionsAL)
+#dropVisitingAL.grid(row=2, column=2, padx='10', pady='10', sticky='ew')
 
-predictButtonAL = Button(root, text="Predict Winner", command=selectedNL)
-predictButtonAL.grid(row=3, column=1, padx='10', pady='10', sticky='ew')
+#predictButtonAL = Button(root, text="Predict Winner", command=selectedNL)
+#predictButtonAL.grid(row=3, column=1, padx='10', pady='10', sticky='ew')
 
-predictButtonAL = Button(root, text="Predict Winner", command=selectedAL)
-predictButtonAL.grid(row=3, column=2, padx='10', pady='10', sticky='ew')
+#predictButtonAL = Button(root, text="Predict Winner", command=selectedAL)
+#predictButtonAL.grid(row=3, column=2, padx='10', pady='10', sticky='ew')
 
 root.mainloop()
