@@ -14,8 +14,8 @@ For further explanation you can use our Google Colab under: https://colab.resear
 # **2. Download input data**
 To use this project you need to download the relevant Data and copy it into the project.
 1. Download data at: https://drive.google.com/file/d/1V7930l90B4TaQzYJcEFQGuNY-eWHDEmF/view?usp=sharing
-2. Add folger "Input" to you project-root
-3. Copy downloaded csvs into Input-Folder
+2. Add folder "Input" to you project-root
+3. Copy downloaded csvs from Input-Folder into Input-Folder in project-root
 
 # **3. Merge Data**
 1. To merge the relevant data open mlb.aio.py and run the script
@@ -24,8 +24,10 @@ To use this project you need to download the relevant Data and copy it into the 
 
 # **4. Start training (optional)**
 1. If you want to train the model run Project/Learning/deep_training_amp.py
-2. Traing models
+2. Train models
  
 # **5. Start Gui**
 Predict Games using the Gui:
 1. Run Project/Frontend/gui.py
+
+For help or explanations contact timurburk@gmail.com
